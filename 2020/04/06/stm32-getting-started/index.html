@@ -7,7 +7,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
 <meta property="article:published_time" content="2020-04-06T05:00:00.000Z">
-<meta property="article:modified_time" content="2024-05-15T08:55:50.540Z">
+<meta property="article:modified_time" content="2020-04-06T05:00:00.000Z">
 <meta property="article:author" content="infinite-zh">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2020/04/06/stm32-getting-started/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
@@ -55,7 +55,7 @@
   isHome: false,
   isHighlightShrink: false,
   isToc: true,
-  postUpdate: '2024-05-15 16:55:50'
+  postUpdate: '2020-04-06 13:00:00'
 }</script><script>(win=>{
       win.saveToLocal = {
         set: (key, value, ttl) => {
@@ -152,7 +152,7 @@
         }
       }
       detectApple()
-    })(window)</script><meta name="generator" content="Hexo 7.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('http://sdifmsux4.hd-bkt.clouddn.com/theme/102707540_p0.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Infinite's Blog"><span class="site-name">Infinite's Blog</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">STM32学习——入门小项目</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-04-06T05:00:00.000Z" title="发表于 2020-04-06 13:00:00">2020-04-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-05-15T08:55:50.540Z" title="更新于 2024-05-15 16:55:50">2024-05-15</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="STM32学习——入门小项目"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="STM32学习——入门小项目"><a href="#STM32学习——入门小项目" class="headerlink" title="STM32学习——入门小项目"></a>STM32学习——入门小项目</h1><h2 id="stm32-getting-started"><a href="#stm32-getting-started" class="headerlink" title="stm32-getting-started"></a>stm32-getting-started</h2><p>这个小项目是来自参加电设时，老师发的STM32入门（进阶）任务，具体的要求如下：</p>
+    })(window)</script><meta name="generator" content="Hexo 7.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/cover/102707540_p0.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Infinite's Blog"><span class="site-name">Infinite's Blog</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">STM32学习——入门小项目</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-04-06T05:00:00.000Z" title="发表于 2020-04-06 13:00:00">2020-04-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2020-04-06T05:00:00.000Z" title="更新于 2020-04-06 13:00:00">2020-04-06</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="STM32学习——入门小项目"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="STM32学习——入门小项目"><a href="#STM32学习——入门小项目" class="headerlink" title="STM32学习——入门小项目"></a>STM32学习——入门小项目</h1><h2 id="stm32-getting-started"><a href="#stm32-getting-started" class="headerlink" title="stm32-getting-started"></a>stm32-getting-started</h2><p>这个小项目是来自参加电设时，老师发的STM32入门（进阶）任务，具体的要求如下：</p>
 <p><strong>软件设计要求</strong></p>
 <ol>
 <li>编写简单I&#x2F;O程序，能用板上的4个基本按键控制10个LED灯的亮灭。（扩展要求：设计不同的流水灯或呼吸灯效果，并能用按键切换）</li>
@@ -165,7 +165,7 @@
 <p>该任务的具体代码请移步<a target="_blank" rel="noopener" href="https://github.com/Zcj119303/STM32_Oscilloscope%EF%BC%88PS:%E5%9B%A0%E4%B8%BA%E7%96%AB%E6%83%85%EF%BC%8C%E6%9D%BF%E5%AD%90%E5%9C%A8%E5%AD%A6%E6%A0%A1%EF%BC%8C%E7%AD%89%E5%9B%9E%E5%8E%BB%E4%BA%86%E5%9C%A8%E4%B8%8A%E4%BC%A0%E5%B1%95%E7%A4%BA%E6%95%88%E6%9E%9C%E3%80%82%E3%80%82%E3%80%82%E3%80%82%E3%80%82%E3%80%82%EF%BC%89">https://github.com/Zcj119303/STM32_Oscilloscope（PS:因为疫情，板子在学校，等回去了在上传展示效果。。。。。。）</a></p>
 <p>该软件设计要求，最高标准是能够把上述的6个设计集成在一个程序当中，在切换时不需要重新烧录代码，因此我在设计的时候，使用了操作系统UCos，来达到任务切换的目标，并且使用UCos使得我在第4个设计中，能够使用Graph控件显示波形，使得显示更为美观。</p>
 <p>接下来，我将详细介绍整个工程的架构。</p>
-<p><img src="http://sdifmsux4.hd-bkt.clouddn.com/stm32-getting-started/STM32_1.png" alt="img"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/stm32-getting-started/STM32_1.png" alt="img"></p>
 <p>该工程由6个窗口组成，其中主界面，作为函数刚进入的界面，由5个按键组成，分别进入每一个任务窗口，其中第4、6个任务合并成了一个任务。</p>
 <p>任务1、2作为STM32的入门任务我这里就不做的描述，在界面上，任务1使用了13个按键，10个按键用来控制任意一个IO的高低电平，即LED的亮灭，另外三个按键，分别是Water lamp（流水灯）、Breathing lamp（呼吸灯）以及ESC（用于返回主界面），任务2使用了7个按键，分别控制字的上下左右移动，速度的增加与减少，以及ESC按键。另外，关于任务的切换，我会在后面有所描述。</p>
 <p>任务3采用的PWM生成的定时器是TIM14，存储参数使用的SPI Flash（即代码中W25QXX的部分）。任务3的界面使用了14个按键，其中10个按键组成了数字键盘，Output按键用来波形的输出，Store按键用来存储参数，Backspace用来在输入参数时进行退格，ESC按键用来返回主界面。</p>
@@ -175,7 +175,7 @@
 <p>STM32来做示波器的话，有许多的技术要点，譬如触发功能、等效采样、FFT频谱，相对而言，显示幅值，周期的调整反而是一项比较容易实现的功能。</p>
 <p>在这个任务4中，他要求能够设置触发，因为STM32的功能有限，在这个任务中我做了一个简易触发——用外部中断来进行触发，当信号触发外部中断时，ADC进行采样。</p>
 <p>具体设计流程图如下</p>
-<p><img src="http://sdifmsux4.hd-bkt.clouddn.com/stm32-getting-started/STM32_2.png" alt="img"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/stm32-getting-started/STM32_2.png" alt="img"></p>
 <p>当信号输入，一个上升沿触发外部中断，外部中断中关闭外部中断并使能ADC和DMA（在这里，因为库函数没有相关的函数，因此用了寄存器的操作，详细信息可以去看看STM32的数据手册），ADC采集信号的频率是靠Timer3来进行控制（这也是是一个蛮秀的操作），ADC采集到的数据通过DMA传输到内存的Buff中，当DMA传输完成后，会进入DMA中断，在DMA中断中会告知Graph显示波形，Graph波形显示后会重新打开外部中断，这时会在进入第二次循环。</p>
 <p>上述就是整个设计流程，有关Graph控件的使用可以参照正点原子的EMwin开发手册，在这里我使用的是GRAPH_DATA_YT_AddValue函数，该函数每输入一个值，图像自动后移。</p>
 <p>有关于任务6的测频可以参照我之前的文章中的stm32定时器外部中断的配置，链接如下<a target="_blank" rel="noopener" href="https://infinite-zh.com/archives/56">https://infinite-zh.com/archives/56</a></p>
