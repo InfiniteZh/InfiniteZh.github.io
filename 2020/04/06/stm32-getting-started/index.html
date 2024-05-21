@@ -165,7 +165,7 @@
 <p>该任务的具体代码请移步<a target="_blank" rel="noopener" href="https://github.com/Zcj119303/STM32_Oscilloscope%EF%BC%88PS:%E5%9B%A0%E4%B8%BA%E7%96%AB%E6%83%85%EF%BC%8C%E6%9D%BF%E5%AD%90%E5%9C%A8%E5%AD%A6%E6%A0%A1%EF%BC%8C%E7%AD%89%E5%9B%9E%E5%8E%BB%E4%BA%86%E5%9C%A8%E4%B8%8A%E4%BC%A0%E5%B1%95%E7%A4%BA%E6%95%88%E6%9E%9C%E3%80%82%E3%80%82%E3%80%82%E3%80%82%E3%80%82%E3%80%82%EF%BC%89">https://github.com/Zcj119303/STM32_Oscilloscope（PS:因为疫情，板子在学校，等回去了在上传展示效果。。。。。。）</a></p>
 <p>该软件设计要求，最高标准是能够把上述的6个设计集成在一个程序当中，在切换时不需要重新烧录代码，因此我在设计的时候，使用了操作系统UCos，来达到任务切换的目标，并且使用UCos使得我在第4个设计中，能够使用Graph控件显示波形，使得显示更为美观。</p>
 <p>接下来，我将详细介绍整个工程的架构。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/stm32-getting-started/STM32_1.png" alt="img"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/stm32-getting-started/STM32_1.jpg" alt="img"></p>
 <p>该工程由6个窗口组成，其中主界面，作为函数刚进入的界面，由5个按键组成，分别进入每一个任务窗口，其中第4、6个任务合并成了一个任务。</p>
 <p>任务1、2作为STM32的入门任务我这里就不做的描述，在界面上，任务1使用了13个按键，10个按键用来控制任意一个IO的高低电平，即LED的亮灭，另外三个按键，分别是Water lamp（流水灯）、Breathing lamp（呼吸灯）以及ESC（用于返回主界面），任务2使用了7个按键，分别控制字的上下左右移动，速度的增加与减少，以及ESC按键。另外，关于任务的切换，我会在后面有所描述。</p>
 <p>任务3采用的PWM生成的定时器是TIM14，存储参数使用的SPI Flash（即代码中W25QXX的部分）。任务3的界面使用了14个按键，其中10个按键组成了数字键盘，Output按键用来波形的输出，Store按键用来存储参数，Backspace用来在输入参数时进行退格，ESC按键用来返回主界面。</p>
@@ -175,7 +175,7 @@
 <p>STM32来做示波器的话，有许多的技术要点，譬如触发功能、等效采样、FFT频谱，相对而言，显示幅值，周期的调整反而是一项比较容易实现的功能。</p>
 <p>在这个任务4中，他要求能够设置触发，因为STM32的功能有限，在这个任务中我做了一个简易触发——用外部中断来进行触发，当信号触发外部中断时，ADC进行采样。</p>
 <p>具体设计流程图如下</p>
-<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/stm32-getting-started/STM32_2.png" alt="img"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/stm32-getting-started/STM32_2.jpg" alt="img"></p>
 <p>当信号输入，一个上升沿触发外部中断，外部中断中关闭外部中断并使能ADC和DMA（在这里，因为库函数没有相关的函数，因此用了寄存器的操作，详细信息可以去看看STM32的数据手册），ADC采集信号的频率是靠Timer3来进行控制（这也是是一个蛮秀的操作），ADC采集到的数据通过DMA传输到内存的Buff中，当DMA传输完成后，会进入DMA中断，在DMA中断中会告知Graph显示波形，Graph波形显示后会重新打开外部中断，这时会在进入第二次循环。</p>
 <p>上述就是整个设计流程，有关Graph控件的使用可以参照正点原子的EMwin开发手册，在这里我使用的是GRAPH_DATA_YT_AddValue函数，该函数每输入一个值，图像自动后移。</p>
 <p>有关于任务6的测频可以参照我之前的文章中的stm32定时器外部中断的配置，链接如下<a target="_blank" rel="noopener" href="https://infinite-zh.com/archives/56">https://infinite-zh.com/archives/56</a></p>

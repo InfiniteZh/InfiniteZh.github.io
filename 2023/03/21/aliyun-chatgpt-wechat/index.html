@@ -193,10 +193,10 @@
 
 <h3 id="配置v2rayA"><a href="#配置v2rayA" class="headerlink" title="配置v2rayA"></a>配置v2rayA</h3><p>V2rayA的端口为2017，所以需要现在阿里云的配置安全组中配置防火墙开放2017端口。</p>
 <p>之后就可以在本机访问<code>http://IP:2017</code> 进行图形化配置，具体界面如下所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/aliyun-chatgpt-wechat/v2rayA.jpg" alt="v2rayA"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/aliyun-chatgpt-wechat/v2rayA.png" alt="v2rayA"></p>
 <p>在导入订阅之后，就会发现SERVER出现了节点，然后就可以选择相应的节点，在左上角点击运行。</p>
 <p>此外还需要在设置中配置一下</p>
-<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/aliyun-chatgpt-wechat/setup.jpg" alt="setup"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/aliyun-chatgpt-wechat/setup.png" alt="setup"></p>
 <p>到此为止，就已经可以让服务器科学上网了。</p>
 <p>之后可以<code>curl google.com</code> 查看是否成功。</p>
 <h2 id="接入微信"><a href="#接入微信" class="headerlink" title="接入微信"></a>接入微信</h2><p>在github上有很多轮子，我参考的是如下的方法：<a target="_blank" rel="noopener" href="https://github.com/zhayujie/chatgpt-on-wechat">zhayujie&#x2F;chatgpt-on-wechat: Wechat robot based on ChatGPT, which using OpenAI api and itchat library. 使用ChatGPT搭建微信聊天机器人，基于GPT3.5 API和itchat实现 (github.com)</a></p>
@@ -221,9 +221,9 @@
 
 <p>但会出现<code>Log in time out, reloading QR code</code>问题，参考issue修改代码即可</p>
 <p>需要注意的是，使用conda的话，需要在对应的环境下运行<code>python -m pip show itchat-uos</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/aliyun-chatgpt-wechat/itchat-uos.jpg" alt="itchat-uos"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/aliyun-chatgpt-wechat/itchat-uos.png" alt="itchat-uos"></p>
 <p>然后在<code>/root/miniconda3/envs/chatgpt/lib/python3.8/site-packages/itchat/components/</code>下查看login.py文件，在如下位置加入<code>time.sleep(15)</code>即可。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/aliyun-chatgpt-wechat/code.jpg" alt="code"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/aliyun-chatgpt-wechat/code.png" alt="code"></p>
 <p>此外如果出现如下问题</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">login.py<span class="string">&quot;, line 197, in process_login_info</span></span><br><span class="line"><span class="string">skey = re.findall(&#x27;(.*?)&#x27;, r.text, re.S)[0]</span></span><br><span class="line"><span class="string">IndexError: list index out of range</span></span><br></pre></td></tr></table></figure>
 
