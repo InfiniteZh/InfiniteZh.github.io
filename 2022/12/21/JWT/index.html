@@ -1,9 +1,9 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>JWT学习与使用 | Infinite's Blog</title><meta name="author" content="infinite-zh"><meta name="copyright" content="infinite-zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1.0.认证方式1、基于Session的认证基于session认证所显露的问题： Session: 每个用户经过我们的应用认证之后，我们的应用都要在服务端做一次记录，以方便用户下次请求的鉴别，通常而言session都是保存在内存中，而随着认证用户的增多，服务端的开销会明显增大。 扩展性: 用户认证之后，服务端做认证记录，如果认证的记录被保存在内存中的话，这意味着用户下次请求还必须要请求在这台服务器">
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>JWT学习与使用 | Infinite's Blog</title><meta name="author" content="infinite-zh"><meta name="copyright" content="infinite-zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这篇文章介绍了JWT（JSON Web Token）的认证方式，它是一种用于安全传输信息的开放标准。JWT通过加密生成token，使得服务端无需保存session数据即可验证用户信息，从而实现无状态的服务端扩展。文章还比较了基于session的传统认证和基于token的认证方式，解释了JWT的结构，包括Header、Payload和Signature三部分，并讨论了使用JWT的场景，如授权和信息交">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JWT学习与使用">
 <meta property="og:url" content="http://example.com/2022/12/21/JWT/index.html">
 <meta property="og:site_name" content="Infinite&#39;s Blog">
-<meta property="og:description" content="1.0.认证方式1、基于Session的认证基于session认证所显露的问题： Session: 每个用户经过我们的应用认证之后，我们的应用都要在服务端做一次记录，以方便用户下次请求的鉴别，通常而言session都是保存在内存中，而随着认证用户的增多，服务端的开销会明显增大。 扩展性: 用户认证之后，服务端做认证记录，如果认证的记录被保存在内存中的话，这意味着用户下次请求还必须要请求在这台服务器">
+<meta property="og:description" content="这篇文章介绍了JWT（JSON Web Token）的认证方式，它是一种用于安全传输信息的开放标准。JWT通过加密生成token，使得服务端无需保存session数据即可验证用户信息，从而实现无状态的服务端扩展。文章还比较了基于session的传统认证和基于token的认证方式，解释了JWT的结构，包括Header、Payload和Signature三部分，并讨论了使用JWT的场景，如授权和信息交">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
 <meta property="article:published_time" content="2022-12-21T00:15:00.000Z">

@@ -1,9 +1,9 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>分布式定时任务Quartz学习与使用 | Infinite's Blog</title><meta name="author" content="infinite-zh"><meta name="copyright" content="infinite-zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="时间轮介绍从具体实现来看，时间轮 是一个基于 「数组」 实现的 「循环队列」 ，数组的每个元素被称为 「槽（slot）」 ，每个槽中存储着一个 「任务列表」 ，这个任务列表的实现较为多样，可以是 「由双向链表实现」 ，也可以是 「由数组实现」。除了基本的存储结构，时间轮还有一根用于指示当前时间的指针，这根指针同时也用于触发所指向的时间槽内任务。该指针以恒定的速度旋转，每经过一个槽即走过一个单位时间">
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>分布式定时任务Quartz学习与使用 | Infinite's Blog</title><meta name="author" content="infinite-zh"><meta name="copyright" content="infinite-zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这篇文章介绍了时间轮的实现原理和结构，以及Quartz定时任务框架的核心概念和在Spring Boot中的实现方法。时间轮是一个基于数组实现的循环队列，每个槽存储任务列表，并通过指针触发任务执行。Quartz框架中，Scheduler负责调度，Trigger定义任务执行时间规则，JobDetail记录任务信息，Job执行业务逻辑。文章还详细说明了在Spring Boot中如何配置Quartz，创建">
 <meta property="og:type" content="article">
 <meta property="og:title" content="分布式定时任务Quartz学习与使用">
 <meta property="og:url" content="http://example.com/2022/12/24/quartz-learning/index.html">
 <meta property="og:site_name" content="Infinite&#39;s Blog">
-<meta property="og:description" content="时间轮介绍从具体实现来看，时间轮 是一个基于 「数组」 实现的 「循环队列」 ，数组的每个元素被称为 「槽（slot）」 ，每个槽中存储着一个 「任务列表」 ，这个任务列表的实现较为多样，可以是 「由双向链表实现」 ，也可以是 「由数组实现」。除了基本的存储结构，时间轮还有一根用于指示当前时间的指针，这根指针同时也用于触发所指向的时间槽内任务。该指针以恒定的速度旋转，每经过一个槽即走过一个单位时间">
+<meta property="og:description" content="这篇文章介绍了时间轮的实现原理和结构，以及Quartz定时任务框架的核心概念和在Spring Boot中的实现方法。时间轮是一个基于数组实现的循环队列，每个槽存储任务列表，并通过指针触发任务执行。Quartz框架中，Scheduler负责调度，Trigger定义任务执行时间规则，JobDetail记录任务信息，Job执行业务逻辑。文章还详细说明了在Spring Boot中如何配置Quartz，创建">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
 <meta property="article:published_time" content="2022-12-24T05:00:00.000Z">
