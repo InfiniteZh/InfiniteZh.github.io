@@ -1,0 +1,336 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>JWT学习与使用 | Infinite journey</title><meta name="author" content="infinite-zh"><meta name="copyright" content="infinite-zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这篇文章介绍了JWT（JSON Web Token）的认证方式，它是一种用于安全传输信息的开放标准。JWT通过加密生成token，使得服务端无需保存session数据即可验证用户信息，从而实现无状态的服务端扩展。文章还比较了基于session的传统认证和基于token的认证方式，解释了JWT的结构，包括Header、Payload和Signature三部分，并讨论了使用JWT的场景，如授权和信息交">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JWT学习与使用">
+<meta property="og:url" content="http://example.com/posts/jwt/index.html">
+<meta property="og:site_name" content="Infinite journey">
+<meta property="og:description" content="这篇文章介绍了JWT（JSON Web Token）的认证方式，它是一种用于安全传输信息的开放标准。JWT通过加密生成token，使得服务端无需保存session数据即可验证用户信息，从而实现无状态的服务端扩展。文章还比较了基于session的传统认证和基于token的认证方式，解释了JWT的结构，包括Header、Payload和Signature三部分，并讨论了使用JWT的场景，如授权和信息交">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2022-12-21T00:15:00.000Z">
+<meta property="article:modified_time" content="2022-12-21T00:15:00.000Z">
+<meta property="article:author" content="infinite-zh">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/posts/jwt/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'JWT学习与使用',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-12-21 08:15:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/cover/102707540_p0.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Infinite journey"><span class="site-name">Infinite journey</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">JWT学习与使用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-21T00:15:00.000Z" title="发表于 2022-12-21 08:15:00">2022-12-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-21T00:15:00.000Z" title="更新于 2022-12-21 08:15:00">2022-12-21</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="JWT学习与使用"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="1-0-认证方式"><a href="#1-0-认证方式" class="headerlink" title="1.0.认证方式"></a>1.0.认证方式</h2><h3 id="1、基于Session的认证"><a href="#1、基于Session的认证" class="headerlink" title="1、基于Session的认证"></a>1、基于Session的认证</h3><p><strong>基于session认证所显露的问题：</strong></p>
+<p><strong>Session:</strong> 每个用户经过我们的应用认证之后，我们的应用都要在服务端做一次记录，以方便用户下次请求的鉴别，通常而言session都是保存在内存中，而随着认证用户的增多，服务端的开销会明显增大。</p>
+<p><strong>扩展性:</strong> 用户认证之后，服务端做认证记录，如果认证的记录被保存在内存中的话，这意味着用户下次请求还必须要请求在这台服务器上,这样才能拿到授权的资源，这样在分布式的应用上，相应的限制了负载均衡器的能力。这也意味着限制了应用的扩展能力。</p>
+<p><strong>CSRF (Cross-Site Request Forgery):</strong> 因为是基于cookie来进行用户识别的, cookie如果被截获，用户就会很容易受到跨站请求伪造的攻击。</p>
+<h3 id="2、基于传统token的认证"><a href="#2、基于传统token的认证" class="headerlink" title="2、基于传统token的认证"></a>2、基于传统token的认证</h3><p>传统的Token，例如：用户登录成功生成对应的令牌，key为令牌 value：userid，隐藏了数据真实性 ,同时将该token存放到redis中，返回对应的真实令牌给客户端存放。 客户端每次访问后端请求的时候，会传递该token在请求中，服务器端接收到该token之后，从redis中查询如果存在的情况下，则说明在有效期内，如果在Redis中不存在的情况下，则说明过期或者token错误。</p>
+<h2 id="1-1-JWT是什么"><a href="#1-1-JWT是什么" class="headerlink" title="1.1.JWT是什么"></a>1.1.JWT是什么</h2><p>JSON Web Token (JWT)是一个开放标准(RFC 7519)，它定义了一种紧凑的、自包含的方式，用于作为JSON对象在各方之间安全地传输信息。该信息可以被验证和信任，因为它是数字签名的。</p>
+<p>是目前流行的跨域认证解决方案，一种基于JSON的、用于在网络上声明某种主张的令牌（token）。</p>
+<p>该token被设计为紧凑且安全的，特别适用于分布式站点的单点登录（SSO）场景。</p>
+<p>JWT的声明一般被用来在身份提供者和服务提供者间传递被认证的用户身份信息，以便于从资源服务器获取资源，也可以增加一些额外的其它业务逻辑所必须的声明信息，该token也可直接被用于认证，也可被加密。</p>
+<p>原理：jwt验证方式是将用户信息通过加密生成token，每次请求服务端只需要使用保存的密钥验证token的正确性，不用再保存任何session数据了，进而服务端变得无状态，容易实现拓展。</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://jwt.io/">https://jwt.io/</a></p>
+<h2 id="1-2-什么时候你应该用JWT"><a href="#1-2-什么时候你应该用JWT" class="headerlink" title="1.2. 什么时候你应该用JWT"></a>1.2. 什么时候你应该用JWT</h2><p>下列场景中使用JSON Web Token是很有用的：</p>
+<ul>
+<li><strong>Authorization</strong> (授权) : 这是使用JWT的最常见场景。一旦用户登录，后续每个请求都将包含JWT，允许用户访问该令牌允许的路由、服务和资源。单点登录是现在广泛使用的JWT的一个特性，因为它的开销很小，并且可以轻松地跨域使用。</li>
+<li><strong>Information Exchange</strong> (信息交换) : 对于安全的在各方之间传输信息而言，JSON Web Tokens无疑是一种很好的方式。因为JWTs可以被签名，例如，用公钥&#x2F;私钥对，你可以确定发送人就是它们所说的那个人。另外，由于签名是使用头和有效负载计算的，您还可以验证内容没有被篡改。</li>
+</ul>
+<h2 id="1-3-JWT的结构是什么样的"><a href="#1-3-JWT的结构是什么样的" class="headerlink" title="1.3. JWT的结构是什么样的"></a>1.3. JWT的结构是什么样的</h2><p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/JWT/jwt-structure.png" alt="jwt-structure"></p>
+<p>JSON Web Token由三部分组成，它们之间用圆点(.)连接。这三部分分别是：</p>
+<ul>
+<li>Header</li>
+<li>Payload</li>
+<li>Signature</li>
+</ul>
+<p>因此，一个典型的JWT看起来是这个样子的：</p>
+<p>xxxxx.yyyyy.zzzzz</p>
+<p>接下来，具体看一下每一部分：</p>
+<h3 id="1-3-1、Header头部"><a href="#1-3-1、Header头部" class="headerlink" title="1.3.1、Header头部"></a>1.3.1、Header头部</h3><p>header典型的由两部分组成：token的类型（“JWT”）和算法名称（比如：HMAC SHA256或者RSA等等）。</p>
+<p>例如：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/JWT/header.png" alt="header"></p>
+<p>然后，用Base64对这个JSON编码就得到JWT的第一部分</p>
+<ul>
+<li>typ 为声明类型，指定 “JWT”</li>
+<li>alg 为加密的算法，默认是 “HS256”</li>
+</ul>
+<p>也可以是下列中的算法：</p>
+<table>
+<thead>
+<tr>
+<th align="left">JWS</th>
+<th align="left">算法名称</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">HS256</td>
+<td align="left">HMAC256</td>
+<td align="left">HMAC with SHA-256</td>
+</tr>
+<tr>
+<td align="left">HS384</td>
+<td align="left">HMAC384</td>
+<td align="left">HMAC with SHA-384</td>
+</tr>
+<tr>
+<td align="left">HS512</td>
+<td align="left">HMAC512</td>
+<td align="left">HMAC with SHA-512</td>
+</tr>
+<tr>
+<td align="left">RS256</td>
+<td align="left">RSA256</td>
+<td align="left">RSASSA-PKCS1-v1_5 with SHA-256</td>
+</tr>
+<tr>
+<td align="left">RS384</td>
+<td align="left">RSA384</td>
+<td align="left">RSASSA-PKCS1-v1_5 with SHA-384</td>
+</tr>
+<tr>
+<td align="left">RS512</td>
+<td align="left">RSA512</td>
+<td align="left">RSASSA-PKCS1-v1_5 with SHA-512</td>
+</tr>
+<tr>
+<td align="left">ES256</td>
+<td align="left">ECDSA256</td>
+<td align="left">ECDSA with curve P-256 and SHA-256</td>
+</tr>
+<tr>
+<td align="left">ES384</td>
+<td align="left">ECDSA384</td>
+<td align="left">ECDSA with curve P-384 and SHA-384</td>
+</tr>
+<tr>
+<td align="left">ES512</td>
+<td align="left">ECDSA512</td>
+<td align="left">ECDSA with curve P-521 and SHA-512</td>
+</tr>
+</tbody></table>
+<h3 id="1-3-2、Payload装载"><a href="#1-3-2、Payload装载" class="headerlink" title="1.3.2、Payload装载"></a>1.3.2、Payload装载</h3><p>JWT的第二部分是payload，它包含声明（要求）。声明是关于实体(通常是用户)和其他数据的声明。声明有三种类型: registered, public 和 private。</p>
+<ul>
+<li>Registered claims : 这里有一组预定义的声明，它们不是强制的，但是推荐。比如：iss (issuer), exp (expiration time), sub (subject), aud (audience)等。 <ul>
+<li>iss (issuer)：签发人</li>
+<li>exp (expiration time)：过期时间</li>
+<li>sub (subject)：主题</li>
+<li>aud (audience)：受众</li>
+<li>nbf (Not Before)：生效时间</li>
+<li>iat (Issued At)：签发时间</li>
+<li>jti (JWT ID)：编号</li>
+</ul>
+</li>
+<li>Public claims : 可以随意定义。</li>
+<li>Private claims : 用于在同意使用它们的各方之间共享信息，并且不是注册的或公开的声明。</li>
+</ul>
+<p>下面是一个例子：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/JWT/payload.png" alt="payload"></p>
+<p>对payload进行Base64编码就得到JWT的第二部分</p>
+<p>注意，不要在JWT的payload或header中放置敏感信息，除非它们是加密的。</p>
+<h3 id="1-3-3、Signature签名"><a href="#1-3-3、Signature签名" class="headerlink" title="1.3.3、Signature签名"></a>1.3.3、Signature签名</h3><p>为了得到签名部分，你必须有编码过的header、编码过的payload、一个秘钥，签名算法是header中指定的那个，然对它们签名即可。</p>
+<p>例如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">HMACSHA256</span>(<span class="title function_">base64UrlEncode</span>(header) + <span class="string">&quot;.&quot;</span> + <span class="title function_">base64UrlEncode</span>(payload), secret)</span><br></pre></td></tr></table></figure>
+
+<p>复制</p>
+<p>签名是用于验证消息在传递过程中有没有被更改，并且，对于使用私钥签名的token，它还可以验证JWT的发送方是否为它所称的发送方。</p>
+<p>看一张官网的图就明白了：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/JWT/exp.png" alt="exp"></p>
+<h2 id="1-4-JWT是如何工作的"><a href="#1-4-JWT是如何工作的" class="headerlink" title="1.4. JWT是如何工作的"></a>1.4. JWT是如何工作的</h2><p>在认证的时候，当用户用他们的凭证成功登录以后，一个JSON Web Token将会被返回。此后，token就是用户凭证了，你必须非常小心以防止出现安全问题。一般而言，你保存令牌的时候不应该超过你所需要它的时间。</p>
+<p>无论何时用户想要访问受保护的路由或者资源的时候，用户代理（通常是浏览器）都应该带上JWT，典型的，通常放在Authorization header中，用Bearer schema。</p>
+<p>header应该看起来是这样的：</p>
+<p>Authorization: Bearer &lt;token&gt;</p>
+<p>服务器上的受保护的路由将会检查Authorization header中的JWT是否有效，如果有效，则用户可以访问受保护的资源。如果JWT包含足够多的必需的数据，那么就可以减少对某些操作的数据库查询的需要，尽管可能并不总是如此。</p>
+<p>如果token是在授权头（Authorization header）中发送的，那么跨源资源共享(CORS)将不会成为问题，因为它不使用cookie。</p>
+<p>下面这张图显示了如何获取JWT以及使用它来访问APIs或者资源：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/JWT/jwt-workflow.png" alt="jwt-workflow"></p>
+<ol>
+<li>应用（或者客户端）想授权服务器请求授权。例如，如果用授权码流程的话，就是&#x2F;oauth&#x2F;authorize</li>
+<li>当授权被许可以后，授权服务器返回一个access token给应用</li>
+<li>应用使用access token访问受保护的资源（比如：API）</li>
+</ol>
+<h2 id="1-5-基于Token的身份认证-与-基于服务器的身份认证"><a href="#1-5-基于Token的身份认证-与-基于服务器的身份认证" class="headerlink" title="1.5. 基于Token的身份认证 与 基于服务器的身份认证"></a>1.5. 基于Token的身份认证 与 基于服务器的身份认证</h2><h3 id="1-5-1-基于服务器的身份认证"><a href="#1-5-1-基于服务器的身份认证" class="headerlink" title="1.5.1. 基于服务器的身份认证"></a>1.5.1. 基于服务器的身份认证</h3><p>在讨论基于Token的身份认证是如何工作的以及它的好处之前，我们先来看一下以前我们是怎么做的：</p>
+<blockquote>
+<p> HTTP协议是无状态的，也就是说，如果我们已经认证了一个用户，那么他下一次请求的时候，服务器不知道我是谁，我们必须再次认证 </p>
+</blockquote>
+<p>传统的做法是将已经认证过的用户信息存储在服务器上，比如Session。用户下次请求的时候带着Session ID，然后服务器以此检查用户是否认证过。</p>
+<p>这种基于服务器的身份认证方式存在一些问题：</p>
+<ul>
+<li>Sessions : 每次用户认证通过以后，服务器需要创建一条记录保存用户信息，通常是在内存中，随着认证通过的用户越来越多，服务器的在这里的开销就会越来越大。</li>
+<li>Scalability : 由于Session是在内存中的，这就带来一些扩展性的问题。</li>
+<li>CORS : 当我们想要扩展我们的应用，让我们的数据被多个移动设备使用时，我们必须考虑跨资源共享问题。当使用AJAX调用从另一个域名下获取资源时，我们可能会遇到禁止请求的问题。</li>
+<li>CSRF : 用户很容易受到CSRF攻击。</li>
+</ul>
+<h3 id="1-5-2-JWT与Session的差异"><a href="#1-5-2-JWT与Session的差异" class="headerlink" title="1.5.2. JWT与Session的差异"></a>1.5.2. JWT与Session的差异</h3><p>相同点是，它们都是存储用户信息；然而，Session是在服务器端的，而JWT是在客户端的。</p>
+<p>Session方式存储用户信息的最大问题在于要占用大量服务器内存，增加服务器的开销。</p>
+<p>而JWT方式将用户状态分散到了客户端中，可以明显减轻服务端的内存压力。</p>
+<p>Session的状态是存储在服务器端，客户端只有session id；而Token的状态是存储在客户端。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/JWT/Differences-between-JWT-and-Session.png" alt="Differences-between-JWT-and-Session"></p>
+<h3 id="1-5-3-基于Token的身份认证是如何工作的"><a href="#1-5-3-基于Token的身份认证是如何工作的" class="headerlink" title="1.5.3. 基于Token的身份认证是如何工作的"></a>1.5.3. 基于Token的身份认证是如何工作的</h3><p>基于Token的身份认证是无状态的，服务器或者Session中不会存储任何用户信息。</p>
+<blockquote>
+<p> 没有会话信息意味着应用程序可以根据需要扩展和添加更多的机器，而不必担心用户登录的位置。 </p>
+</blockquote>
+<p>虽然这一实现可能会有所不同，但其主要流程如下：</p>
+<ol>
+<li>用户携带用户名和密码请求访问</li>
+<li>服务器校验用户凭据</li>
+<li>应用提供一个token给客户端</li>
+<li>客户端存储token，并且在随后的每一次请求中都带着它</li>
+<li>服务器校验token并返回数据</li>
+</ol>
+<p>注意：</p>
+<ol>
+<li>每一次请求都需要token</li>
+<li>Token应该放在请求header中</li>
+<li>我们还需要将服务器设置为接受来自所有域的请求，用Access-Control-Allow-Origin: *</li>
+</ol>
+<h3 id="1-5-4-用Token的好处"><a href="#1-5-4-用Token的好处" class="headerlink" title="1.5.4. 用Token的好处"></a>1.5.4. 用Token的好处</h3><ul>
+<li>无状态和可扩展性：Tokens存储在客户端。完全无状态，可扩展。我们的负载均衡器可以将用户传递到任意服务器，因为在任何地方都没有状态或会话信息。</li>
+<li>安全：Token不是Cookie。（The token, not a cookie.）每次请求的时候Token都会被发送。而且，由于没有Cookie被发送，还有助于防止CSRF攻击。即使在你的实现中将token存储到客户端的Cookie中，这个Cookie也只是一种存储机制，而非身份认证机制。没有基于会话的信息可以操作，因为我们没有会话!</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/JWT/Benefits-of-using-Token.png" alt="Benefits-of-using-Token"></p>
+<p>还有一点，token在一段时间以后会过期，这个时候用户需要重新登录。这有助于我们保持安全。还有一个概念叫token撤销，它允许我们根据相同的授权许可使特定的token甚至一组token无效。</p>
+<h3 id="1-5-5-JWT与OAuth的区别"><a href="#1-5-5-JWT与OAuth的区别" class="headerlink" title="1.5.5. JWT与OAuth的区别"></a>1.5.5. JWT与OAuth的区别</h3><ol>
+<li>OAuth2是一种授权框架 ，JWT是一种认证协议</li>
+<li>无论使用哪种方式切记用HTTPS来保证数据的安全性</li>
+<li>OAuth2用在使用第三方账号登录的情况(比如使用weibo, qq, github登录某个app)，而<strong>JWT是用在前后端分离</strong>, 需要简单的对后台API进行保护时使用。</li>
+</ol>
+<h2 id="Spring-Boot使用"><a href="#Spring-Boot使用" class="headerlink" title="Spring Boot使用"></a>Spring Boot使用</h2><p>依赖引入</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">   &lt;groupId&gt;com.auth0&lt;/groupId&gt;</span><br><span class="line">   &lt;artifactId&gt;java-jwt&lt;/artifactId&gt;</span><br><span class="line">   &lt;version&gt;<span class="number">4.3</span><span class="number">.0</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p>具体使用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.auth0.jwt.JWT;</span><br><span class="line"><span class="keyword">import</span> com.auth0.jwt.JWTVerifier;</span><br><span class="line"><span class="keyword">import</span> com.auth0.jwt.algorithms.Algorithm;</span><br><span class="line"><span class="keyword">import</span> com.auth0.jwt.exceptions.JWTDecodeException;</span><br><span class="line"><span class="keyword">import</span> com.auth0.jwt.interfaces.DecodedJWT;</span><br><span class="line"><span class="keyword">import</span> com.infinite.tikfake.entity.User;</span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JwtUtil</span> &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//指定一个token过期时间（毫秒）</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">long</span> <span class="variable">EXPIRE_TIME</span> <span class="operator">=</span> <span class="number">7</span> * <span class="number">24</span> * <span class="number">60</span> * <span class="number">60</span> * <span class="number">1000</span>;  <span class="comment">// 7天</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">JWT_TOKEN_SECRET_KEY</span> <span class="operator">=</span> <span class="string">&quot;TikFake&quot;</span>;<span class="comment">//</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">createJwtTokenByUser</span><span class="params">(User user)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">secret</span> <span class="operator">=</span> JWT_TOKEN_SECRET_KEY;</span><br><span class="line"></span><br><span class="line">        <span class="type">Date</span> <span class="variable">date</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Date</span>(System.currentTimeMillis() + EXPIRE_TIME);</span><br><span class="line">        <span class="type">Algorithm</span> <span class="variable">algorithm</span> <span class="operator">=</span> Algorithm.HMAC256(secret);    <span class="comment">//使用密钥进行哈希</span></span><br><span class="line">        <span class="comment">// 附带username信息的token</span></span><br><span class="line">        <span class="keyword">return</span> JWT.create()</span><br><span class="line">                .withClaim(<span class="string">&quot;username&quot;</span>, user.getName())</span><br><span class="line">                .withExpiresAt(date)  <span class="comment">//过期时间</span></span><br><span class="line">                .sign(algorithm);     <span class="comment">//签名算法</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 校验token是否正确</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">verifyTokenOfUser</span><span class="params">(String token)</span> &#123;</span><br><span class="line">        log.info(<span class="string">&quot;verifyTokenOfUser&quot;</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">secret</span> <span class="operator">=</span> JWT_TOKEN_SECRET_KEY;<span class="comment">//</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">//根据密钥生成JWT效验器</span></span><br><span class="line">        <span class="type">Algorithm</span> <span class="variable">algorithm</span> <span class="operator">=</span> Algorithm.HMAC256(secret);</span><br><span class="line">        <span class="type">JWTVerifier</span> <span class="variable">verifier</span> <span class="operator">=</span> JWT.require(algorithm)</span><br><span class="line">                .withClaim(<span class="string">&quot;username&quot;</span>, getUsername(token))<span class="comment">//从不加密的消息体中取出username</span></span><br><span class="line">                .build();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">DecodedJWT</span> <span class="variable">jwt</span> <span class="operator">=</span> verifier.verify(token);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Exception exception)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 在token中获取到username信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">getUsername</span><span class="params">(String token)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">DecodedJWT</span> <span class="variable">jwt</span> <span class="operator">=</span> JWT.decode(token);</span><br><span class="line">            <span class="keyword">return</span> jwt.getClaim(<span class="string">&quot;username&quot;</span>).asString();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (JWTDecodeException e) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 判断是否过期</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">isExpire</span><span class="params">(String token)</span> &#123;</span><br><span class="line">        <span class="type">DecodedJWT</span> <span class="variable">jwt</span> <span class="operator">=</span> JWT.decode(token);</span><br><span class="line">        <span class="keyword">return</span> jwt.getExpiresAt().getTime() &lt; System.currentTimeMillis();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">infinite-zh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/posts/jwt/">http://example.com/posts/jwt/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Infinite journey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/quartz-learning/" title="分布式定时任务Quartz学习与使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">分布式定时任务Quartz学习与使用</div></div></a></div><div class="next-post pull-right"><a href="/posts/markdown2pdf/" title="Markdown转PDF"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Markdown转PDF</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">infinite-zh</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-0-%E8%AE%A4%E8%AF%81%E6%96%B9%E5%BC%8F"><span class="toc-number">1.</span> <span class="toc-text">1.0.认证方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E5%9F%BA%E4%BA%8ESession%E7%9A%84%E8%AE%A4%E8%AF%81"><span class="toc-number">1.1.</span> <span class="toc-text">1、基于Session的认证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E5%9F%BA%E4%BA%8E%E4%BC%A0%E7%BB%9Ftoken%E7%9A%84%E8%AE%A4%E8%AF%81"><span class="toc-number">1.2.</span> <span class="toc-text">2、基于传统token的认证</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-JWT%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">2.</span> <span class="toc-text">1.1.JWT是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E4%BD%A0%E5%BA%94%E8%AF%A5%E7%94%A8JWT"><span class="toc-number">3.</span> <span class="toc-text">1.2. 什么时候你应该用JWT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-JWT%E7%9A%84%E7%BB%93%E6%9E%84%E6%98%AF%E4%BB%80%E4%B9%88%E6%A0%B7%E7%9A%84"><span class="toc-number">4.</span> <span class="toc-text">1.3. JWT的结构是什么样的</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-1%E3%80%81Header%E5%A4%B4%E9%83%A8"><span class="toc-number">4.1.</span> <span class="toc-text">1.3.1、Header头部</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-2%E3%80%81Payload%E8%A3%85%E8%BD%BD"><span class="toc-number">4.2.</span> <span class="toc-text">1.3.2、Payload装载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-3%E3%80%81Signature%E7%AD%BE%E5%90%8D"><span class="toc-number">4.3.</span> <span class="toc-text">1.3.3、Signature签名</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-JWT%E6%98%AF%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C%E7%9A%84"><span class="toc-number">5.</span> <span class="toc-text">1.4. JWT是如何工作的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-5-%E5%9F%BA%E4%BA%8EToken%E7%9A%84%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81-%E4%B8%8E-%E5%9F%BA%E4%BA%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81"><span class="toc-number">6.</span> <span class="toc-text">1.5. 基于Token的身份认证 与 基于服务器的身份认证</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-1-%E5%9F%BA%E4%BA%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81"><span class="toc-number">6.1.</span> <span class="toc-text">1.5.1. 基于服务器的身份认证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-2-JWT%E4%B8%8ESession%E7%9A%84%E5%B7%AE%E5%BC%82"><span class="toc-number">6.2.</span> <span class="toc-text">1.5.2. JWT与Session的差异</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-3-%E5%9F%BA%E4%BA%8EToken%E7%9A%84%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E6%98%AF%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C%E7%9A%84"><span class="toc-number">6.3.</span> <span class="toc-text">1.5.3. 基于Token的身份认证是如何工作的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-4-%E7%94%A8Token%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-number">6.4.</span> <span class="toc-text">1.5.4. 用Token的好处</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-5-JWT%E4%B8%8EOAuth%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">6.5.</span> <span class="toc-text">1.5.5. JWT与OAuth的区别</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-Boot%E4%BD%BF%E7%94%A8"><span class="toc-number">7.</span> <span class="toc-text">Spring Boot使用</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/server-development-config/" title="服务器开发环境配置指南">服务器开发环境配置指南</a><time datetime="2023-06-06T05:00:00.000Z" title="发表于 2023-06-06 13:00:00">2023-06-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/aliyun-chatgpt-wechat/" title="阿里云部署ChatGPT并实现微信接入">阿里云部署ChatGPT并实现微信接入</a><time datetime="2023-03-21T00:00:00.000Z" title="发表于 2023-03-21 08:00:00">2023-03-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/quartz-learning/" title="分布式定时任务Quartz学习与使用">分布式定时任务Quartz学习与使用</a><time datetime="2022-12-24T05:00:00.000Z" title="发表于 2022-12-24 13:00:00">2022-12-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/jwt/" title="JWT学习与使用">JWT学习与使用</a><time datetime="2022-12-21T00:15:00.000Z" title="发表于 2022-12-21 08:15:00">2022-12-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/markdown2pdf/" title="Markdown转PDF">Markdown转PDF</a><time datetime="2022-12-05T05:52:00.000Z" title="发表于 2022-12-05 13:52:00">2022-12-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By infinite-zh</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

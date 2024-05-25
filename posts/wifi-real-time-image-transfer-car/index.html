@@ -1,0 +1,294 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>用20块的摄像头（不带fifo的OV7670）做WiFi实时传图小车 | Infinite journey</title><meta name="author" content="infinite-zh"><meta name="copyright" content="infinite-zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这篇文章介绍了一个基于FPGA小车、STM32最小系统、摄像头和无线模块等电子组件，实现的远程可视遥控小车项目。项目包括FPGA部分负责图像获取、存储和传输以及小车控制；STM32部分与FPGA交互、处理图像数据，并与上位机&#x2F;云端交互；上位机&#x2F;云端部分作为显示和控制终端。作者详细描述了OV7670摄像头QVGA配置、FPGA与STM32 SPI通信、图像JPEG压缩、上位机和微信小程序的实现，并提">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用20块的摄像头（不带fifo的OV7670）做WiFi实时传图小车">
+<meta property="og:url" content="http://example.com/posts/wifi-real-time-image-transfer-car/index.html">
+<meta property="og:site_name" content="Infinite journey">
+<meta property="og:description" content="这篇文章介绍了一个基于FPGA小车、STM32最小系统、摄像头和无线模块等电子组件，实现的远程可视遥控小车项目。项目包括FPGA部分负责图像获取、存储和传输以及小车控制；STM32部分与FPGA交互、处理图像数据，并与上位机&#x2F;云端交互；上位机&#x2F;云端部分作为显示和控制终端。作者详细描述了OV7670摄像头QVGA配置、FPGA与STM32 SPI通信、图像JPEG压缩、上位机和微信小程序的实现，并提">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2020-08-31T05:00:00.000Z">
+<meta property="article:modified_time" content="2020-08-31T05:00:00.000Z">
+<meta property="article:author" content="infinite-zh">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/posts/wifi-real-time-image-transfer-car/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '用20块的摄像头（不带fifo的OV7670）做WiFi实时传图小车',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2020-08-31 13:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/cover/102707540_p0.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Infinite journey"><span class="site-name">Infinite journey</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">用20块的摄像头（不带fifo的OV7670）做WiFi实时传图小车</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-08-31T05:00:00.000Z" title="发表于 2020-08-31 13:00:00">2020-08-31</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2020-08-31T05:00:00.000Z" title="更新于 2020-08-31 13:00:00">2020-08-31</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="用20块的摄像头（不带fifo的OV7670）做WiFi实时传图小车"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="零、导读"><a href="#零、导读" class="headerlink" title="零、导读"></a>零、导读</h2><p>在这篇文章中，你将看到如下内容：</p>
+<ol>
+<li>OV7670 QVGA配置的注意事项；</li>
+<li>将FPGA做成一个FIFO驱动不带FIFO的OV7670;</li>
+<li>libjpeg阉割库的使用；</li>
+<li>ESP8266传图给上位机的简单实现。</li>
+<li>ESP8266传图给OneNET，微信小程序的方案</li>
+<li>项目代码可以参考<a target="_blank" rel="noopener" href="https://github.com/InfiniteZh/ov7670-">https://github.com/InfiniteZh/ov7670-</a></li>
+</ol>
+<h2 id="一、项目背景与吐槽"><a href="#一、项目背景与吐槽" class="headerlink" title="一、项目背景与吐槽"></a>一、项目背景与吐槽</h2><p>该项目是大三下的嵌入式短学期，因为一些的原因做的不太一样，正常做的是一个STM32F103的WiFi上位机的项目，但为了玩地快乐我做了一个FPGA控制的小车，并且还兼备了WIFI传图，上位机&#x2F;微信小程序显示与控制地功能。</p>
+<p>我在老师发布项目之后的三天内，使用STM32F1战舰开发板进行了测试（毕竟一下子玩的太大，怕失手），确定了初步方案，当时感觉是捡了一个大便宜，做了一个简单的任务，但当我看到FPGA的RTL图的时候，我自闭了。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/wifi-real-time-image-transfer-car/wificar_fpga.png" alt="还有许多小模块没全部展现出来，特别是在sdram ip中，害，自闭"></p>
+<p>要往上面这个FPGA中动手脚是比较困难的。特别是在我对整个sdram存储的运用还不太熟练的情况下。</p>
+<p>吐槽：本来没打算做微信小程序的，结果在最后的实验验收要求上看到了安卓手机控制。阿这，这是我没想到的，只得硬着头皮做完。。。</p>
+<h2 id="二、项目设计方案"><a href="#二、项目设计方案" class="headerlink" title="二、项目设计方案"></a>二、项目设计方案</h2><p>回归正题，这次的任务的要求如下：</p>
+<p>基于FPGA小车、STM32最小系统、摄像头、无线模块等常用电子模块，实现一个远程可视的遥控小车。</p>
+<p>对此我的设计方案如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/wifi-real-time-image-transfer-car/wificar_flow_chart.png" alt="系统框图"></p>
+<p>系统设计方案</p>
+<p>由系统框图所示，整个系统设计方案分成三个部分，分别是FPGA部分，STM32部分以及上位机&#x2F;云端部分。</p>
+<h3 id="1、FPGA部分"><a href="#1、FPGA部分" class="headerlink" title="1、FPGA部分"></a>1、<strong>FPGA部分</strong></h3><p>使用黑金的AX301来进行设计，FPGA在系统中的作用是获取图像、存储图像、传输图像以及控制小车。</p>
+<ol>
+<li>获取图像<ul>
+<li>使用OV7670摄像头来进行图像获取，其中对摄像头的配置，采用QVGA、RGB565的格式输出，输出窗口设置为256*128的大小</li>
+</ul>
+</li>
+<li>图像存储<ul>
+<li>使用SRAM来进行图像的存储，同时采用乒乓操作，一边获取图像一边传输图像；</li>
+</ul>
+</li>
+<li>图像的传输<ul>
+<li>为了加快图像的传输速率，采用流水线，将RGB565的图像转换成灰度图，然后通过SPI作为从机进行图像的传输;</li>
+</ul>
+</li>
+<li>小车控制<ul>
+<li>根据获得的控制指令，输出1KHZ的PWM波驱动电桥控制电机从而控制小车，其中PWM的占空比可调，在进行转弯时为了增加驱动能力，适当提高PWM的占空比。</li>
+</ul>
+</li>
+</ol>
+<h3 id="2、STM32部分"><a href="#2、STM32部分" class="headerlink" title="2、STM32部分"></a>2、<strong>STM32部分</strong></h3><p>使用自制的STM32F407最小系统板，STM32在系统中的作用是与FPGA进行交互，对图像数据进行处理，与上位机&#x2F;云端进行交互，是连接云端与底层的通道。</p>
+<ol>
+<li>与FPGA进行交互<ul>
+<li>STM32使用硬件SPI作为主机，使用21M的速率与FPGA进行双向传输，即获取FPGA中存储的图像数据的同时，传达小车的方向控制指令。</li>
+</ul>
+</li>
+<li>对图像数据进行处理<ul>
+<li>根据计算，256*128的图像即使是作为灰度图仍然后32KB的大小，相对于ESP8266的115200的波特率来说图像还是太大，因此需要对图像进行jpeg压缩，在jpeg的压缩方面，借助了libjpeg的库。实测灰度图压缩为jpeg后图像大小压缩至1KB左右。大大加快了传输的速率。</li>
+</ul>
+</li>
+<li>与上位机&#x2F;云端进行交互<ul>
+<li>STM32驱动ESP8266一方面可以与PC的上位机进行交互，传输图片到上位机上并获取来自上位机的小车控制指令，另一方面可以与OneNET进行交互，通过http协议post图像数据到OneNET上，并能通过get获取OneNET上的小车控制指令。</li>
+</ul>
+</li>
+</ol>
+<h3 id="3、上位机-云端部分"><a href="#3、上位机-云端部分" class="headerlink" title="3、上位机&#x2F;云端部分"></a>3、<strong>上位机&#x2F;云端部分</strong></h3><ul>
+<li>这一部分是最后的显示与控制终端，其中上位机部分采用C#进行编写，云端部分借助OneNET这个物联网开发平台存储数据，并通过微信小程序获得图像数据以及传达控制指令。</li>
+</ul>
+<h2 id="三、项目具体实现与难点攻克"><a href="#三、项目具体实现与难点攻克" class="headerlink" title="三、项目具体实现与难点攻克"></a>三、项目具体实现与难点攻克</h2><h3 id="1、有关FPGA的方案设计"><a href="#1、有关FPGA的方案设计" class="headerlink" title="1、有关FPGA的方案设计"></a>1、有关FPGA的方案设计</h3><p>借助黑金的OV7670_sdram的例程，进行修改。</p>
+<h4 id="1、OV7670-QVGA的配置"><a href="#1、OV7670-QVGA的配置" class="headerlink" title="1、OV7670 QVGA的配置"></a>1、OV7670 QVGA的配置</h4><p>根据OV7670的datasheet，就会发现OV7670有上百个寄存器（阿这），一一地去配置显然过于复杂，不过我使用的程序是黑金官方的一个例程，黑金官方已经给了OV7670的寄存器的配置，而我们要做的是修改他的寄存器配置，因为一般来说FPGA驱动OV7670都是为了VGA的传输，所以基本都是配置了VGA的模式，但VGA模式对于这个项目来说是在是太大了，我们需要将他修改到QVGA模式，并且设置输出的窗口，这里借鉴了STM32驱动OV7670时的配置（详细可以参考<a target="_blank" rel="noopener" href="http://www.51hei.com/bbs/dpj-92272-1.html">这个</a>），以下的代码给出了QVGA的输出以及设置输出窗口的相应寄存器的配置。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/wifi-real-time-image-transfer-car/wificar_code.png" alt="img"></p>
+<p>这里我给出了三个输出窗口的配置，分别是128<em>64、320</em>240和256*128</p>
+<p>但需要注意的时，将OV7670配置成QVGA时，根据datasheet给出的波形图。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/wifi-real-time-image-transfer-car/wificar_frame_timing.png" alt="img"></p>
+<p>我们可以看到他的输出速率是VGA模式的一半，表现在应用中，我发线他的PCLK输出变为原来的一半，即原来我是25M的PCLK，但我设置位QVGA时，他的输出变成了12.5M。</p>
+<p>这里必须安利一波singalTap，我本来没有注意这一点，然后他的输出数据一支不对，然后我就将OV7670的全部引脚全部放到singalTap上，然后就发现了他的PCLK变为原来的一半，这时候我才想到datasheet这个时序图的含义……他的这个时钟是会影响到后续的fifo等一系列操作。</p>
+<h4 id="2、修改保存的图像的大小"><a href="#2、修改保存的图像的大小" class="headerlink" title="2、修改保存的图像的大小"></a>2、修改保存的图像的大小</h4><p>要改变图像大小，只需修改sdram_vga_top.v的最大地址大小</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/wifi-real-time-image-transfer-car/wificar_lihua.png" alt="img"></p>
+<p>NOTE：这里的地址大小最好是与wr_length和rd_length的整数倍，否则在显示图像的时候会出现图像会进行移动。</p>
+<p>注意：我在上面记录了OV7670的配置时给了320*240的图像大小，但我最后并没有使用，一方面是因为图像大了传输过慢，另一方面是因为建议图像的大小是他的wr_length以及rd_length的整数倍，否则显示图像的时候可能会出现图像的移动。</p>
+<h4 id="3、FPGA与STM32的SPI通信"><a href="#3、FPGA与STM32的SPI通信" class="headerlink" title="3、FPGA与STM32的SPI通信"></a>3、FPGA与STM32的SPI通信</h4><p>为了实现高速率的传输，我设置了SPI通信为21M，需要注意的是一下几点：</p>
+<ol>
+<li>为了保证SPI和STM32的通信，一定要让STM32与FPGA共地！！！</li>
+<li>SPI模块的时钟<ul>
+<li>在FPGA这里经过测试发现SPI模块的时钟建议倍频到200M，一开始我设置了100M的时钟，发现SPI通信会发生错位，有时候还会紊乱，提高时钟的频率可以解决这个问题。</li>
+</ul>
+</li>
+<li>SPI模块的CS<ul>
+<li>一般SPI模块都会设计一个CS，然后又由于STM32的硬件SPI只有3个输出脚，我自己定义了一个CS，但实际的使用效果不佳，我查看SingalTap的时候发现，好几次SPI传输的时候这个CS脚会突然来一个高电平，导致我的数据出现问题，预计原因是STM32与FPGA之间的地还是不稳，因此我最后没有用32控制CS，而是引出来进行手动复位……</li>
+</ul>
+</li>
+</ol>
+<h4 id="4、将FPGA做成一个FIFO"><a href="#4、将FPGA做成一个FIFO" class="headerlink" title="4、将FPGA做成一个FIFO"></a>4、将FPGA做成一个FIFO</h4><p>因为原来的程序中，摄像头的数据是存储在sdram中，使用了乒乓操作，一边读取一边存储，并且设计是考虑到VGA的时序，基本读取与存储是可以很好的同步的进行，但在我这个项目中，我对图像数据的处理明显时远远慢于OV7670图像数据的输出，因此我需要将FPGA做成一个保存数据的FIFO（吐槽一下：此处点题，20块的摄像头不带fifo就是这么真实，但凡他有一个fifo我可以简便不少…..）</p>
+<p>为了达到fifo的效果，我从sdban_switch入手修改了他的交换bank的条件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">case(state_write)</span><br><span class="line">3&#x27;d0:begin </span><br><span class="line">	if(frame_write_done  &amp;&amp; frame_read_done) //to be sure data with the same image has been wrote</span><br><span class="line">		state_write &lt;= 3&#x27;d1;</span><br><span class="line">	else </span><br><span class="line">		state_write &lt;= 3&#x27;d0;</span><br><span class="line">	end</span><br><span class="line">3&#x27;d1:begin wr_load &lt;= 1&#x27;b0; state_write &lt;= 3&#x27;d2; end</span><br><span class="line">3&#x27;d2:begin wr_load &lt;= 1&#x27;b1; state_write &lt;= 3&#x27;d3; end</span><br><span class="line">3&#x27;d3:begin wr_load &lt;= 1&#x27;b0; state_write &lt;= 3&#x27;d4; end</span><br><span class="line">3&#x27;d4:begin</span><br><span class="line">	if(bank_switch_flag)</span><br><span class="line">		state_write &lt;= 3&#x27;d5;</span><br><span class="line">	else</span><br><span class="line">		state_write &lt;= 3&#x27;d4;</span><br><span class="line">	end</span><br><span class="line">3&#x27;d5:begin</span><br><span class="line">	if(frame_write_done  &amp;&amp; frame_read_done) //to be sure data with the same image has been wrote</span><br><span class="line">		begin</span><br><span class="line">		wr_bank &lt;= ~wr_bank;</span><br><span class="line">		state_write &lt;= 3&#x27;d0;</span><br><span class="line">		end</span><br><span class="line">	else</span><br><span class="line">		begin</span><br><span class="line">		wr_bank &lt;= wr_bank;</span><br><span class="line">		state_write &lt;= 3&#x27;d4;</span><br><span class="line">		end</span><br><span class="line">	end</span><br><span class="line">default:;</span><br></pre></td></tr></table></figure>
+
+<p>如上所示，在读取完并且写入完毕后才交换bank，以此来配合较慢的读取，但是相应的最终会导致显示的图像有延迟，延迟取决于传输时间、压缩时间等一系列因素。</p>
+<p>不过，其中的<strong>神来之笔</strong>是我将读取的时钟更换了，不再由pll锁相环提供，而是由SPI模块的读取完毕的信号来作为时钟，通过rtl图可以清楚的看到这一点</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/wifi-real-time-image-transfer-car/wificar_lcd.png" alt="img"></p>
+<p>这条时钟一方面是作为sdram读取fifo的时钟，另一方面是作为RGB565转换灰度图的时钟，因为这个转换是完全流水线结构，所以他的只需要经过3个时钟周期的时滞就可以8位流量的输出灰度值。</p>
+<h4 id="5、小车的驱动"><a href="#5、小车的驱动" class="headerlink" title="5、小车的驱动"></a>5、小车的驱动</h4><p>小车的驱动主要是依靠PWM来进行驱动，但需要注意的是，转弯时的摩擦力比较大，需要更强的驱动能力，因此在收到转弯指令的时候可以适当提高PWM的占空比，提高驱动能力。</p>
+<h3 id="2、有关STM32的设计"><a href="#2、有关STM32的设计" class="headerlink" title="2、有关STM32的设计"></a>2、有关STM32的设计</h3><h4 id="1、libjpeg库的使用"><a href="#1、libjpeg库的使用" class="headerlink" title="1、libjpeg库的使用"></a>1、libjpeg库的使用</h4><p>这个库是我在CSDN找的，这是链接<a target="_blank" rel="noopener" href="https://blog.csdn.net/forwardjia/article/details/82179191">https://blog.csdn.net/forwardjia/article/details/82179191</a></p>
+<p>但他是RGB的压缩，我为了更进一步的压缩，把他修改成了灰度图的jpeg压缩，具体可以看我的代码，或者直接使用。</p>
+<p>这位大佬移植了libjpeg，不过貌似是一个比较旧的版本……压缩质量使用的还是浮点数，不过不影响使用。</p>
+<p>值得一提的是，如果去查看STM32Cube_FW_F4可以在其的Projects-&gt;STM32F429-Discovery-&gt;Application下可以看到LibJPEG，这个是官方的移植，不过他把整个LibJPEG给移植过来了，整个工程太大了，所以还是选择使用这个阉割版。。。。。。</p>
+<h4 id="2、STM32与上位机通信"><a href="#2、STM32与上位机通信" class="headerlink" title="2、STM32与上位机通信"></a>2、STM32与上位机通信</h4><p>在这里我设置了ESP8266作Client，上位机作为Server，ESP8266通过配置连接WIFI，然后访问我电脑的IP，就可以与上位机建立socket进行图片的传输。</p>
+<p>STM32与上位机机通信最好是要有自定的协议，要有帧头，校验位等，但这个数据量实在有点大，我就只设置了一个传输数据包大小的帧头，然后就粗暴的上传了，不过效果还蛮好的说</p>
+<p>效果如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/wifi-real-time-image-transfer-car/wificar_result.png" alt="全损画质"></p>
+<h4 id="3、STM32与OneNET进行交互"><a href="#3、STM32与OneNET进行交互" class="headerlink" title="3、STM32与OneNET进行交互"></a>3、STM32与OneNET进行交互</h4><p>STM32对OneNET进行交互，OneNET官方给了许多的协议，例如MQTT，EDP和HTTP等，不过对于我来说，最快的还是直接使用API，用get获取数据点，用post上传图片。</p>
+<p>为了顺利的与OneNET进行交互，建议先使用网络调试助手进行调试，调试方面可以参考这个链接：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_42401265/article/details/101053604">https://blog.csdn.net/qq_42401265/article/details/101053604</a></p>
+<p>使用OneNet提供的服务器IP地址：183.230.40.34 和端口：80 连接服务器。</p>
+<p>网络调试助手 使用正点原子的XNet。</p>
+<p>对于图像传输，这是我上传的数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">POST http://api.heclouds.com/bindata?device_id=607169499&amp;datastream_id=image HTTP/1.1</span><br><span class="line">api-key:your api-key</span><br><span class="line">Host:api.heclouds.com</span><br><span class="line">Content-Length:3493</span><br></pre></td></tr></table></figure>
+
+<p>后面加上图像数据，图像数据可以是用上面链接给的一个小软件。</p>
+<p>在传输的时候需要注意的是，<strong>在传输末尾要加上两个换行符</strong>，这个很关键，没有这两个换行符数据上传就会有很多的问题。另外OneNET的Api-key建议直接使用Master-api-key</p>
+<p>在STM32的代码上，如下所示</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">u8 *p;</span><br><span class="line">int t =0;</span><br><span class="line">p=mymalloc(SRAMIN,32);							//申请32字节内存</span><br><span class="line">sprintf((char*)p,&quot;Content-Length:%d\r\n\r\n&quot;,pt_buf);</span><br><span class="line">u3_printf(&quot;POST http://api.heclouds.com/bindata?device_id=607169499&amp;datastream_id=image&amp;desc=testfile HTTP/1.1\r\n&quot;);</span><br><span class="line">u3_printf(&quot;api-key: your api key\r\n&quot;);</span><br><span class="line">u3_printf(&quot;Host:api.heclouds.com\r\n&quot;);</span><br><span class="line">u3_printf(p);</span><br><span class="line">for(t = 0;t&lt;pt_buf;t++)</span><br><span class="line">&#123;</span><br><span class="line">	UART3_Send_Data(JPG_enc_buf[t]);		</span><br><span class="line">&#125;</span><br><span class="line">myfree(SRAMIN,p);</span><br></pre></td></tr></table></figure>
+
+<p>同理，获取OneNET的数据点</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">USART3_RX_STA=0;</span><br><span class="line">u3_printf(&quot;GET http://api.heclouds.com/devices/607169499/datastreams/direction HTTP/1.1\r\n&quot;);</span><br><span class="line">u3_printf(&quot;api-key:your api key\r\n&quot;);</span><br><span class="line">u3_printf(&quot;Host:api.heclouds.com\r\n\r\n&quot;);</span><br><span class="line">delay_ms(100);</span><br><span class="line">	USART3_RX_STA=0;</span><br><span class="line">char *c1=strstr(USART3_RX_BUF, &quot;current_value&quot;);</span><br><span class="line"></span><br><span class="line">return *(c1+16);</span><br></pre></td></tr></table></figure>
+
+<p>这里对于收到的数据可以使用cJSON进行解析，但需要注意的是，收到的数据还有一个HTTP的头，需要将他除去，如下所示</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Date: Wed, 01 Jul 2020 15:23:14 GMT</span><br><span class="line">Content-Type: application/json</span><br><span class="line">Content-Length: 133</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Server: Apache-Coyote/1.1</span><br><span class="line">Pragma: no-cache</span><br></pre></td></tr></table></figure>
+
+<p>因此为了方便使用，我直接使用了strstr函数，通过查找current_value来获取数据点的数据。</p>
+<h4 id="4、上位机的编写"><a href="#4、上位机的编写" class="headerlink" title="4、上位机的编写"></a>4、上位机的编写</h4><p>上位机的编写我是用的是C#来进行编写，下列展示一下主要的代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">void TSReceive()</span><br><span class="line">&#123;</span><br><span class="line">    aimSocket = mySocket.Accept();//服务端监听到的Socket为服务端发送数据的目标socket</span><br><span class="line">    infoLabel.Text = &quot;连接成功&quot;;</span><br><span class="line">    byte[] buffer = new byte[4];</span><br><span class="line">    while (true)</span><br><span class="line">    &#123;</span><br><span class="line">        try</span><br><span class="line">        &#123;</span><br><span class="line">            aimSocket.Receive(buffer, buffer.Length, SocketFlags.None);</span><br><span class="line">            int contentLen = BitConverter.ToInt32(buffer, 0);</span><br><span class="line">            int size = 0;</span><br><span class="line">            MemoryStream ms = new MemoryStream();</span><br><span class="line">            while (size &lt; contentLen)</span><br><span class="line">            &#123;</span><br><span class="line">                //分多次接收,每次接收256个字节,</span><br><span class="line">                byte[] bits = new byte[256];</span><br><span class="line">                int r = aimSocket.Receive(bits, bits.Length, SocketFlags.None);//接收到监听的Socket的数据</span><br><span class="line">                if (r == 0)</span><br><span class="line">                &#123;</span><br><span class="line">                    MessageBox.Show(&quot;连接断开&quot;);</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">                ms.Write(bits, 0, r);</span><br><span class="line">                size += r;</span><br><span class="line">            &#125;</span><br><span class="line">            Image img = Image.FromStream(ms);</span><br><span class="line">            picBox.Image = null;</span><br><span class="line">            picBox.Image = img;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        catch</span><br><span class="line">        &#123; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码是TCP Server的线程，在该线程中，通过监听socket，获取数据然后将他显示到Image控件上。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/wifi-real-time-image-transfer-car/wificar_host.png" alt="整体上位机布局"></p>
+<p>在控制指令方面，我设置了一个帧头，byte[] CtrBuf &#x3D; new byte[2] { 0xA3, 0x20 };</p>
+<p>虽然实际上并没有起到什么作用…….</p>
+<h4 id="5、微信小程序的编写"><a href="#5、微信小程序的编写" class="headerlink" title="5、微信小程序的编写"></a>5、微信小程序的编写</h4><p>微信小程序方面，下图展示的获取图像数据并展示的代码。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/wifi-real-time-image-transfer-car/wificar_wechat_code.png" alt="img"></p>
+<p>图像的转换是主要靠OneNET获取文件的api，获取图像的二进制流文件，然后将其转换成base64的类型，就可以显示图像了，这里主要要注意两点：</p>
+<ol>
+<li>在request的函数中加一个responseType: ‘arraybuffer’, 这样接收到的数据就是arraybuffer的形式，就可通过arrayBufferToBase64转换成base64的形式，然后加上 data:image&#x2F;jpg;base64, 就可以直接显示图像了。</li>
+<li>使用OneNET获取文件的api的时候要使用master-api-key，否则可能会报错，我当时报的错是 errno:3 auth failed， 为此我还问了OneNET客服呢。。。。。</li>
+</ol>
+<h2 id="四、成果展示"><a href="#四、成果展示" class="headerlink" title="四、成果展示"></a>四、成果展示</h2><h3 id="1、上位机接受图像"><a href="#1、上位机接受图像" class="headerlink" title="1、上位机接受图像"></a>1、上位机接受图像</h3><p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/wifi-real-time-image-transfer-car/wificar_jpegTCP.png" alt="img"></p>
+<h3 id="2、手机端微信小程序"><a href="#2、手机端微信小程序" class="headerlink" title="2、手机端微信小程序"></a>2、手机端微信小程序</h3><p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/wifi-real-time-image-transfer-car/wificar_wechat.png" alt="界面做的简陋了一点。。。。。"></p>
+<h2 id="五、缺陷与提高部分"><a href="#五、缺陷与提高部分" class="headerlink" title="五、缺陷与提高部分"></a>五、缺陷与提高部分</h2><p>本次实验最大的缺陷是延迟过高，一方面是因为受限于Jpeg压缩的效率太低，另一方面则是因为数据量太大，传输的速率太慢，在这里我有一些改进与提高的想法，但因为时间的限制就没有付诸于实践。</p>
+<p>1、SPI传输在STM32那边可以使用DMA进行传输，将数据直接存储到定义的存储空间中，但这会引起另一个问题，就是DMA对于SPI双向传输该如何进行处理。毕竟不仅要接收数据，还需要传送方向指令。</p>
+<p>2、DMA传输还可以用在串口wifi上传图像上，但相对于第一条，这一条的实现难度可能更大一些。</p>
+<p>3、氪金，没错，花钱换一个摄像头，换一个能直接jpeg形式输出的摄像头，例如ov2640，这样就可以省去jpeg压缩的时间，大大提高效率，（但凡有个好的摄像头，这个东西也不至于这么复杂）</p>
+<p>4、增加协议。包括STM32与FPGA通过SPI传输的协议，以及STM32与上位机的传输协议。如果是用http传输，STM32与OneNET的协议倒不是非常必要。STM32与FPGA通过SPI的协议可以保证数据传输的稳定与可靠，如果可以最好与CS脚联合设计。STM32与上位机的协议也可以保证出错的概率降低。（目前虽然差错出现的概率不大，但还是会有。。。。。）</p>
+<h2 id="六、评价"><a href="#六、评价" class="headerlink" title="六、评价"></a>六、评价</h2><p>总的来说，这一个项目虽然不大，但他的涉及面广，从FPGA到STM32再到上位机和云端小程序等，（我就是伪全栈工程师）。大学在我看来还是要什么都去碰一碰，毕竟学习的道路是越来越专精的，在高考的时候已经从众多行业中选择了电子，到了后面的研究生阶段还将要继续细分，因此什么都玩一玩在之后的学习上还是能给我不少帮助的。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">infinite-zh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/posts/wifi-real-time-image-transfer-car/">http://example.com/posts/wifi-real-time-image-transfer-car/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Infinite journey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/stm32-serial-dma-font-update/" title="STM32——串口DMA字库更新"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">STM32——串口DMA字库更新</div></div></a></div><div class="next-post pull-right"><a href="/posts/fpga-iterative-division/" title="FPGA除法——迭代除法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">FPGA除法——迭代除法</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">infinite-zh</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9B%B6%E3%80%81%E5%AF%BC%E8%AF%BB"><span class="toc-number">1.</span> <span class="toc-text">零、导读</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E9%A1%B9%E7%9B%AE%E8%83%8C%E6%99%AF%E4%B8%8E%E5%90%90%E6%A7%BD"><span class="toc-number">2.</span> <span class="toc-text">一、项目背景与吐槽</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E9%A1%B9%E7%9B%AE%E8%AE%BE%E8%AE%A1%E6%96%B9%E6%A1%88"><span class="toc-number">3.</span> <span class="toc-text">二、项目设计方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81FPGA%E9%83%A8%E5%88%86"><span class="toc-number">3.1.</span> <span class="toc-text">1、FPGA部分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81STM32%E9%83%A8%E5%88%86"><span class="toc-number">3.2.</span> <span class="toc-text">2、STM32部分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81%E4%B8%8A%E4%BD%8D%E6%9C%BA-%E4%BA%91%E7%AB%AF%E9%83%A8%E5%88%86"><span class="toc-number">3.3.</span> <span class="toc-text">3、上位机&#x2F;云端部分</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E9%A1%B9%E7%9B%AE%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0%E4%B8%8E%E9%9A%BE%E7%82%B9%E6%94%BB%E5%85%8B"><span class="toc-number">4.</span> <span class="toc-text">三、项目具体实现与难点攻克</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E6%9C%89%E5%85%B3FPGA%E7%9A%84%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1"><span class="toc-number">4.1.</span> <span class="toc-text">1、有关FPGA的方案设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81OV7670-QVGA%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-number">4.1.1.</span> <span class="toc-text">1、OV7670 QVGA的配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E4%BF%AE%E6%94%B9%E4%BF%9D%E5%AD%98%E7%9A%84%E5%9B%BE%E5%83%8F%E7%9A%84%E5%A4%A7%E5%B0%8F"><span class="toc-number">4.1.2.</span> <span class="toc-text">2、修改保存的图像的大小</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81FPGA%E4%B8%8ESTM32%E7%9A%84SPI%E9%80%9A%E4%BF%A1"><span class="toc-number">4.1.3.</span> <span class="toc-text">3、FPGA与STM32的SPI通信</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%81%E5%B0%86FPGA%E5%81%9A%E6%88%90%E4%B8%80%E4%B8%AAFIFO"><span class="toc-number">4.1.4.</span> <span class="toc-text">4、将FPGA做成一个FIFO</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5%E3%80%81%E5%B0%8F%E8%BD%A6%E7%9A%84%E9%A9%B1%E5%8A%A8"><span class="toc-number">4.1.5.</span> <span class="toc-text">5、小车的驱动</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E6%9C%89%E5%85%B3STM32%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="toc-number">4.2.</span> <span class="toc-text">2、有关STM32的设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81libjpeg%E5%BA%93%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">4.2.1.</span> <span class="toc-text">1、libjpeg库的使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81STM32%E4%B8%8E%E4%B8%8A%E4%BD%8D%E6%9C%BA%E9%80%9A%E4%BF%A1"><span class="toc-number">4.2.2.</span> <span class="toc-text">2、STM32与上位机通信</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81STM32%E4%B8%8EOneNET%E8%BF%9B%E8%A1%8C%E4%BA%A4%E4%BA%92"><span class="toc-number">4.2.3.</span> <span class="toc-text">3、STM32与OneNET进行交互</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%81%E4%B8%8A%E4%BD%8D%E6%9C%BA%E7%9A%84%E7%BC%96%E5%86%99"><span class="toc-number">4.2.4.</span> <span class="toc-text">4、上位机的编写</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5%E3%80%81%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E7%9A%84%E7%BC%96%E5%86%99"><span class="toc-number">4.2.5.</span> <span class="toc-text">5、微信小程序的编写</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="toc-number">5.</span> <span class="toc-text">四、成果展示</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E4%B8%8A%E4%BD%8D%E6%9C%BA%E6%8E%A5%E5%8F%97%E5%9B%BE%E5%83%8F"><span class="toc-number">5.1.</span> <span class="toc-text">1、上位机接受图像</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E6%89%8B%E6%9C%BA%E7%AB%AF%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F"><span class="toc-number">5.2.</span> <span class="toc-text">2、手机端微信小程序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%BC%BA%E9%99%B7%E4%B8%8E%E6%8F%90%E9%AB%98%E9%83%A8%E5%88%86"><span class="toc-number">6.</span> <span class="toc-text">五、缺陷与提高部分</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E8%AF%84%E4%BB%B7"><span class="toc-number">7.</span> <span class="toc-text">六、评价</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/server-development-config/" title="服务器开发环境配置指南">服务器开发环境配置指南</a><time datetime="2023-06-06T05:00:00.000Z" title="发表于 2023-06-06 13:00:00">2023-06-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/aliyun-chatgpt-wechat/" title="阿里云部署ChatGPT并实现微信接入">阿里云部署ChatGPT并实现微信接入</a><time datetime="2023-03-21T00:00:00.000Z" title="发表于 2023-03-21 08:00:00">2023-03-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/quartz-learning/" title="分布式定时任务Quartz学习与使用">分布式定时任务Quartz学习与使用</a><time datetime="2022-12-24T05:00:00.000Z" title="发表于 2022-12-24 13:00:00">2022-12-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/jwt/" title="JWT学习与使用">JWT学习与使用</a><time datetime="2022-12-21T00:15:00.000Z" title="发表于 2022-12-21 08:15:00">2022-12-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/markdown2pdf/" title="Markdown转PDF">Markdown转PDF</a><time datetime="2022-12-05T05:52:00.000Z" title="发表于 2022-12-05 13:52:00">2022-12-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By infinite-zh</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

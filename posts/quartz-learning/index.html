@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>分布式定时任务Quartz学习与使用 | Infinite journey</title><meta name="author" content="infinite-zh"><meta name="copyright" content="infinite-zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这篇文章介绍了时间轮的实现原理和结构，以及Quartz定时任务框架的核心概念和在Spring Boot中的实现方法。时间轮是一个基于数组实现的循环队列，每个槽存储任务列表，并通过指针触发任务执行。Quartz框架中，Scheduler负责调度，Trigger定义任务执行时间规则，JobDetail记录任务信息，Job执行业务逻辑。文章还详细说明了在Spring Boot中如何配置Quartz，创建">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式定时任务Quartz学习与使用">
+<meta property="og:url" content="http://example.com/posts/quartz-learning/index.html">
+<meta property="og:site_name" content="Infinite journey">
+<meta property="og:description" content="这篇文章介绍了时间轮的实现原理和结构，以及Quartz定时任务框架的核心概念和在Spring Boot中的实现方法。时间轮是一个基于数组实现的循环队列，每个槽存储任务列表，并通过指针触发任务执行。Quartz框架中，Scheduler负责调度，Trigger定义任务执行时间规则，JobDetail记录任务信息，Job执行业务逻辑。文章还详细说明了在Spring Boot中如何配置Quartz，创建">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2022-12-24T05:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-24T05:00:00.000Z">
+<meta property="article:author" content="infinite-zh">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/posts/quartz-learning/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '分布式定时任务Quartz学习与使用',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-12-24 13:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/cover/102707540_p0.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Infinite journey"><span class="site-name">Infinite journey</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">分布式定时任务Quartz学习与使用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-24T05:00:00.000Z" title="发表于 2022-12-24 13:00:00">2022-12-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-24T05:00:00.000Z" title="更新于 2022-12-24 13:00:00">2022-12-24</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="分布式定时任务Quartz学习与使用"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="时间轮介绍"><a href="#时间轮介绍" class="headerlink" title="时间轮介绍"></a>时间轮介绍</h2><p>从具体实现来看，<code>时间轮</code> 是一个基于 <strong>「数组」</strong> 实现的 <strong>「循环队列」</strong> ，数组的每个元素被称为 <strong>「槽（slot）」</strong> ，每个槽中存储着一个 <strong>「任务列表」</strong> ，这个任务列表的实现较为多样，可以是 <strong>「由双向链表实现」</strong> ，也可以是 <strong>「由数组实现」</strong>。除了基本的存储结构，时间轮还有一根用于指示当前时间的指针，这根指针同时也用于触发所指向的时间槽内任务。该指针以恒定的速度旋转，每经过一个槽即走过一个单位时间<em>（所以也可以将槽称为时间槽，因为它即表示时间刻度，也表示存储空间）</em>，旋转一圈则走过时间轮的一个生命周期。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/quartz/Quartz.webp" alt="img"></p>
+<p>而上图采用的是多层级时间轮<br>多层级时间轮从逻辑上和我们日常使用的时钟颇为相似，上一层级的时间轮中的一个时间槽（单位时间）等于下一层级的时间轮的一个时间周期。</p>
+<h2 id="Quartz核心概念"><a href="#Quartz核心概念" class="headerlink" title="Quartz核心概念"></a>Quartz核心概念</h2><ul>
+<li><p>Scheduler为调度器负责整个定时系统的调度，内部通过线程池进行调度，下文阐述。</p>
+</li>
+<li><p>Trigger为触发器记录着调度任务的时间规则，主要有四种类型：SimpleTrigger、CronTrigger、DataIntervalTrigger、NthIncludedTrigger，在项目中常用的为：SimpleTrigger和CronTrigger。</p>
+</li>
+<li><p>JobDetail为定时任务的信息载体，可以记录Job的名字、组及任务执行的具体类和任务执行所需要的参数</p>
+</li>
+<li><p>Job为任务的真正执行体，承载着具体的业务逻辑。</p>
+</li>
+</ul>
+<p>先由SchedulerFactory创建Scheduler调度器后，由调度器去调取即将执行的Trigger，执行时获取到对于的JobDetail信息，找到对应的Job类执行业务逻辑。</p>
+<h2 id="Spring-Boot-实现"><a href="#Spring-Boot-实现" class="headerlink" title="Spring Boot 实现"></a>Spring Boot 实现</h2><p>下面实现的是一个使用Quartz定时将Redis的数据传到mysql中同步。</p>
+<h3 id="1-引入依赖"><a href="#1-引入依赖" class="headerlink" title="1. 引入依赖"></a>1. 引入依赖</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-boot-starter-quartz&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-配置Quartz"><a href="#2-配置Quartz" class="headerlink" title="2. 配置Quartz"></a>2. 配置Quartz</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">QuartzConfig</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">LIKE_TASK_IDENTITY</span> <span class="operator">=</span> <span class="string">&quot;LikeTaskQuartz&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> JobDetail <span class="title function_">quartzDetail</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> JobBuilder.newJob(FavoriteTask.class).withIdentity(LIKE_TASK_IDENTITY).storeDurably().build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> Trigger <span class="title function_">quartzTrigger</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="type">SimpleScheduleBuilder</span> <span class="variable">scheduleBuilder</span> <span class="operator">=</span> SimpleScheduleBuilder.simpleSchedule()</span><br><span class="line">                .withIntervalInMinutes(<span class="number">15</span>) </span><br><span class="line">                .repeatForever();</span><br><span class="line">        <span class="keyword">return</span> TriggerBuilder.newTrigger().forJob(quartzDetail())</span><br><span class="line">                .withIdentity(LIKE_TASK_IDENTITY)</span><br><span class="line">                .withSchedule(scheduleBuilder)</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>JobDetail</strong><br>JobDetail对象是在将job加入scheduler时，由客户端程序（你的程序）创建的。它包含job的各种属性设置，以及用于存储job实例状态信息的JobDataMap。<br>在创建JobDetail时，我们需要将要执行的job的类名传给了JobDetail，这样scheduler就知道了要执行何种类型的job。<br>我们还可以给通过JobDetail给job设置name和group。<br>每次当scheduler执行job时，在调用其execute(…)方法之前会创建该类的一个新的实例；执行完毕，对该实例的引用就被丢弃了，实例会被垃圾回收；这种执行策略带来的一个后果是，job必须有一个无参的构造函数（当使用默认的JobFactory时）；另一个后果是，在job类中，不应该定义有状态的数据属性，因为在job的多次执行中，这些属性的值不会保留。</p>
+<h3 id="3-Job类实现"><a href="#3-Job类实现" class="headerlink" title="3. Job类实现"></a>3. Job类实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FavoriteTask</span> <span class="keyword">extends</span> <span class="title class_">QuartzJobBean</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    FavoriteService favoriteService;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    CommentService commentService;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">SimpleDateFormat</span> <span class="variable">sdf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleDateFormat</span>(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">executeInternal</span><span class="params">(JobExecutionContext jobExecutionContext)</span> &#123;</span><br><span class="line"></span><br><span class="line">        log.info(<span class="string">&quot;LikeTask-------- &#123;&#125;&quot;</span>, sdf.format(<span class="keyword">new</span> <span class="title class_">Date</span>()));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//将 Redis 里的点赞信息同步到数据库里</span></span><br><span class="line">        favoriteService.transFavoriteFromRedis2DB();</span><br><span class="line">        favoriteService.transFavoriteCountFromRedis2DB();</span><br><span class="line">        commentService.transCommentCountFromRedis2DB();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Job</strong><br>定义一个实现了Job的类（或者QuartzJobBean），这个类表名job需要完成那些业务。<br>当一个Job被trigger被触发触发时，execute()方法会被scheduler的一个工作线程调用；传递给execute()方法的JobExecutionContext对象中保存着该job运行时的一些信息 ，比如执行job的scheduler的引用，触发job的trigger的引用，JobDetail对象引用，以及一些其它信息。</p>
+<h3 id="Job-DataMap"><a href="#Job-DataMap" class="headerlink" title="Job DataMap"></a>Job DataMap</h3><p>JobDataMap<br>JobDataMap中可以包含不限量的（序列化的）数据对象，在job实例执行的时候，可以使用其中的数据；JobDataMap是Java Map接口的一个实现，额外增加了一些便于存取基本类型的数据的方法。<br>将job加入到scheduler之前，在构建JobDetail时，可以将数据放入JobDataMap。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//构建JobDetail实例</span></span><br><span class="line"><span class="type">JobDetail</span> <span class="variable">job</span> <span class="operator">=</span> JobBuilder.newJob(HelloJob.class)</span><br><span class="line">                           .withIdentity(<span class="string">&quot;helloJob&quot;</span>, <span class="string">&quot;hello&quot;</span>)<span class="comment">//给job命名并分组</span></span><br><span class="line">                           .usingJobData(<span class="string">&quot;jobdd&quot;</span>, <span class="string">&quot;hello job&quot;</span>)<span class="comment">//通过JobBuilder的usingJobData方法给JobDataMap中塞</span></span><br><span class="line">                           .usingJobData(jobDataMap)</span><br><span class="line">                           .build();</span><br><span class="line">   </span><br></pre></td></tr></table></figure>
+
+   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">System.err.println(context.getJobDetail().getJobDataMap().get(<span class="string">&quot;jobcc&quot;</span>));</span><br><span class="line">System.err.println(context.getJobDetail().getJobDataMap().get(<span class="string">&quot;jobdd&quot;</span>));</span><br><span class="line">System.err.println(context.getJobDetail().getJobDataMap().get(<span class="string">&quot;jobaa&quot;</span>));</span><br></pre></td></tr></table></figure>
+
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_38846242/article/details/88650112">(17条消息) Quartz学习笔记（二）Job、JobDetail、JobDataMap__飞飞飞飞的博客-CSDN博客_jobdatamap</a></li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">infinite-zh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/posts/quartz-learning/">http://example.com/posts/quartz-learning/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Infinite journey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/aliyun-chatgpt-wechat/" title="阿里云部署ChatGPT并实现微信接入"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">阿里云部署ChatGPT并实现微信接入</div></div></a></div><div class="next-post pull-right"><a href="/posts/jwt/" title="JWT学习与使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">JWT学习与使用</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">infinite-zh</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E8%BD%AE%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">时间轮介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Quartz%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="toc-number">2.</span> <span class="toc-text">Quartz核心概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-Boot-%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">Spring Boot 实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%BC%95%E5%85%A5%E4%BE%9D%E8%B5%96"><span class="toc-number">3.1.</span> <span class="toc-text">1. 引入依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%85%8D%E7%BD%AEQuartz"><span class="toc-number">3.2.</span> <span class="toc-text">2. 配置Quartz</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Job%E7%B1%BB%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.3.</span> <span class="toc-text">3. Job类实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Job-DataMap"><span class="toc-number">3.4.</span> <span class="toc-text">Job DataMap</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-number">4.</span> <span class="toc-text">Reference</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/server-development-config/" title="服务器开发环境配置指南">服务器开发环境配置指南</a><time datetime="2023-06-06T05:00:00.000Z" title="发表于 2023-06-06 13:00:00">2023-06-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/aliyun-chatgpt-wechat/" title="阿里云部署ChatGPT并实现微信接入">阿里云部署ChatGPT并实现微信接入</a><time datetime="2023-03-21T00:00:00.000Z" title="发表于 2023-03-21 08:00:00">2023-03-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/quartz-learning/" title="分布式定时任务Quartz学习与使用">分布式定时任务Quartz学习与使用</a><time datetime="2022-12-24T05:00:00.000Z" title="发表于 2022-12-24 13:00:00">2022-12-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/jwt/" title="JWT学习与使用">JWT学习与使用</a><time datetime="2022-12-21T00:15:00.000Z" title="发表于 2022-12-21 08:15:00">2022-12-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/markdown2pdf/" title="Markdown转PDF">Markdown转PDF</a><time datetime="2022-12-05T05:52:00.000Z" title="发表于 2022-12-05 13:52:00">2022-12-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By infinite-zh</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>STM32学习——入门小项目 | Infinite journey</title><meta name="author" content="infinite-zh"><meta name="copyright" content="infinite-zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这篇文章介绍了一个STM32入门小项目，包含六个软件设计任务：1) 控制LED灯亮灭和流水灯&#x2F;呼吸灯效果；2) 显示欢迎信息和模拟广告牌文字滚动；3) 输出可调占空比的100kHz PWM波形并存储参数；4) 采集1kHz正弦波信号并在显示屏上显示波形和幅度值；5) 低频信号发生器，生成并显示不同波形；6) 测量正弦波信号频率。项目使用UCos+Emwin实现，代码可在GitHub查看。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="STM32学习——入门小项目">
+<meta property="og:url" content="http://example.com/posts/stm32-getting-started/index.html">
+<meta property="og:site_name" content="Infinite journey">
+<meta property="og:description" content="这篇文章介绍了一个STM32入门小项目，包含六个软件设计任务：1) 控制LED灯亮灭和流水灯&#x2F;呼吸灯效果；2) 显示欢迎信息和模拟广告牌文字滚动；3) 输出可调占空比的100kHz PWM波形并存储参数；4) 采集1kHz正弦波信号并在显示屏上显示波形和幅度值；5) 低频信号发生器，生成并显示不同波形；6) 测量正弦波信号频率。项目使用UCos+Emwin实现，代码可在GitHub查看。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2020-04-06T05:00:00.000Z">
+<meta property="article:modified_time" content="2020-04-06T05:00:00.000Z">
+<meta property="article:author" content="infinite-zh">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/posts/stm32-getting-started/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'STM32学习——入门小项目',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2020-04-06 13:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/cover/102707540_p0.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Infinite journey"><span class="site-name">Infinite journey</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">STM32学习——入门小项目</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-04-06T05:00:00.000Z" title="发表于 2020-04-06 13:00:00">2020-04-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2020-04-06T05:00:00.000Z" title="更新于 2020-04-06 13:00:00">2020-04-06</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="STM32学习——入门小项目"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>这个小项目是来自参加电设时，老师发的STM32入门（进阶）任务，具体的要求如下：</p>
+<p><strong>软件设计要求</strong></p>
+<ol>
+<li>编写简单I&#x2F;O程序，能用板上的4个基本按键控制10个LED灯的亮灭。（扩展要求：设计不同的流水灯或呼吸灯效果，并能用按键切换）</li>
+<li>编写显示模块的显示程序，能在显示屏上显示欢迎信息，欢迎信息包括学号姓名。（扩展要求：能模拟广告牌的文字滚动显示效果，并用按键控制滚动方向和速度）</li>
+<li>编写程序输出PWM波形（频率为100kHz，占空比通过按键可调），能把设置参数存错于I2C接口的EEPROM或SPI Flash或MCU片内Flash中，掉电重启后自动使用存错的参数</li>
+<li>综合设计：使用MCU中的ADC采集1kHz正弦波信号（幅度不做要求），在显示屏上显示该信号波形与幅度值，要求稳定显示正弦波（提示：设置触发）</li>
+<li>综合设计：一个低频信号发生器。具备以下功能：使用STM32的DAC输出功能，生成10KHz以下方波、三角波、锯齿波、正弦波。能在液晶屏上显示频率、信号类型。可用按键切换输出信号类型、频率。要求波形尽可能平滑完整，幅度固定1V；频率可调1KHz～10KHz，步进100Hz。</li>
+<li>综合设计：使用STM32的定时器信号捕捉功能，测量标准信号发生器输出的正弦波信号频率，测量范围100Hz～3MHz，精度1％</li>
+</ol>
+<p>该任务的具体代码请移步<a target="_blank" rel="noopener" href="https://github.com/Zcj119303/STM32_Oscilloscope%EF%BC%88PS:%E5%9B%A0%E4%B8%BA%E7%96%AB%E6%83%85%EF%BC%8C%E6%9D%BF%E5%AD%90%E5%9C%A8%E5%AD%A6%E6%A0%A1%EF%BC%8C%E7%AD%89%E5%9B%9E%E5%8E%BB%E4%BA%86%E5%9C%A8%E4%B8%8A%E4%BC%A0%E5%B1%95%E7%A4%BA%E6%95%88%E6%9E%9C%E3%80%82%E3%80%82%E3%80%82%E3%80%82%E3%80%82%E3%80%82%EF%BC%89">https://github.com/Zcj119303/STM32_Oscilloscope（PS:因为疫情，板子在学校，等回去了在上传展示效果。。。。。。）</a></p>
+<p>该软件设计要求，最高标准是能够把上述的6个设计集成在一个程序当中，在切换时不需要重新烧录代码，因此我在设计的时候，使用了操作系统UCos，来达到任务切换的目标，并且使用UCos使得我在第4个设计中，能够使用Graph控件显示波形，使得显示更为美观。</p>
+<p>接下来，我将详细介绍整个工程的架构。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/stm32-getting-started/STM32_1.jpg" alt="img"></p>
+<p>该工程由6个窗口组成，其中主界面，作为函数刚进入的界面，由5个按键组成，分别进入每一个任务窗口，其中第4、6个任务合并成了一个任务。</p>
+<p>任务1、2作为STM32的入门任务我这里就不做的描述，在界面上，任务1使用了13个按键，10个按键用来控制任意一个IO的高低电平，即LED的亮灭，另外三个按键，分别是Water lamp（流水灯）、Breathing lamp（呼吸灯）以及ESC（用于返回主界面），任务2使用了7个按键，分别控制字的上下左右移动，速度的增加与减少，以及ESC按键。另外，关于任务的切换，我会在后面有所描述。</p>
+<p>任务3采用的PWM生成的定时器是TIM14，存储参数使用的SPI Flash（即代码中W25QXX的部分）。任务3的界面使用了14个按键，其中10个按键组成了数字键盘，Output按键用来波形的输出，Store按键用来存储参数，Backspace用来在输入参数时进行退格，ESC按键用来返回主界面。</p>
+<p>任务4是整个任务的核心，因此我先讲任务5。任务5的界面由7个按键和一个Graph组成，其中七个按键分别是Sine Wave（正弦波），Triangular wave（三角波），Square wave（方波），Sawtooth wave（锯齿波），Frequence++（频率增加），Frequence–（频率降低）（频率步进100Hz）以及ESC。Graph是画图控件，也是任务4的主要控件，具体我将在后面介绍，在任务5中，Graph将根据你的按键来显示波形，提示用户现在输出的是属于哪一类波形。</p>
+<p>在波形的产生上，具体可参照HardWare中的waveoutput.c，其中描述了生成波形表，用DMA连接DAC输出波形。关于DMA的配置可以详细了解该文件。（后续有机会会再分享一个有关DMA的应用，不过具体…咕咕咕…）</p>
+<p>最后，就是这个任务的难点了，任务4——简易的低频示波器（不完善）。有一说一，任务4只是STM32制作示波器的门缝，通过该门缝，我们可以一窥示波器的风采。</p>
+<p>STM32来做示波器的话，有许多的技术要点，譬如触发功能、等效采样、FFT频谱，相对而言，显示幅值，周期的调整反而是一项比较容易实现的功能。</p>
+<p>在这个任务4中，他要求能够设置触发，因为STM32的功能有限，在这个任务中我做了一个简易触发——用外部中断来进行触发，当信号触发外部中断时，ADC进行采样。</p>
+<p>具体设计流程图如下</p>
+<p><img src="https://cdn.jsdelivr.net/gh/InfiniteZh/blog-images@v1.0.0/stm32-getting-started/STM32_2.jpg" alt="img"></p>
+<p>当信号输入，一个上升沿触发外部中断，外部中断中关闭外部中断并使能ADC和DMA（在这里，因为库函数没有相关的函数，因此用了寄存器的操作，详细信息可以去看看STM32的数据手册），ADC采集信号的频率是靠Timer3来进行控制（这也是是一个蛮秀的操作），ADC采集到的数据通过DMA传输到内存的Buff中，当DMA传输完成后，会进入DMA中断，在DMA中断中会告知Graph显示波形，Graph波形显示后会重新打开外部中断，这时会在进入第二次循环。</p>
+<p>上述就是整个设计流程，有关Graph控件的使用可以参照正点原子的EMwin开发手册，在这里我使用的是GRAPH_DATA_YT_AddValue函数，该函数每输入一个值，图像自动后移。</p>
+<p>有关于任务6的测频可以参照我之前的文章中的stm32定时器外部中断的配置，链接如下<a target="_blank" rel="noopener" href="https://infinite-zh.com/archives/56">https://infinite-zh.com/archives/56</a></p>
+<p>最后来讲一下有关于界面的切换，在这个任务中最麻烦的是将这6个任务集成起来，不过如果使用上了Emwin也不算复杂，一般任务切换都是用按键切换，在这个任务中，我用了前文提到的ESC按键来进行界面的切换，而在ESC按键的释放后，使用了如下的函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GUI_EndDialog(pMsg-&gt;hWin, 0);</span><br><span class="line">CreateMain();</span><br></pre></td></tr></table></figure>
+
+<p>其中GUI_EndDialog是很必要的，如果不使用这个函数可能会导致在切换了几次界面后整个程序卡死，这是因为没有将窗口关掉。</p>
+<p>而在界面切换的过程中，需要注意的是，要将在这个界面中所启用的外设给关掉，不然他会影响你在下一个界面中任务。</p>
+<p>关于本个任务4的升级：这个其实只是一个简易的STM32示波器，具有的功能很少，它还可以有很高的前景如：</p>
+<ol>
+<li>使用FPGA控制高速ADC采集信号，提高带宽；</li>
+<li>加入FFT频谱等功能；</li>
+<li>使用等效采样，进一步扩大带宽；</li>
+<li>能够任意修改触发的电压值；</li>
+<li>能够显示李萨如图像等。</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">infinite-zh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/posts/stm32-getting-started/">http://example.com/posts/stm32-getting-started/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Infinite journey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-full"><a href="/posts/fpga-iterative-division/" title="FPGA除法——迭代除法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">FPGA除法——迭代除法</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">infinite-zh</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/server-development-config/" title="服务器开发环境配置指南">服务器开发环境配置指南</a><time datetime="2023-06-06T05:00:00.000Z" title="发表于 2023-06-06 13:00:00">2023-06-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/aliyun-chatgpt-wechat/" title="阿里云部署ChatGPT并实现微信接入">阿里云部署ChatGPT并实现微信接入</a><time datetime="2023-03-21T00:00:00.000Z" title="发表于 2023-03-21 08:00:00">2023-03-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/quartz-learning/" title="分布式定时任务Quartz学习与使用">分布式定时任务Quartz学习与使用</a><time datetime="2022-12-24T05:00:00.000Z" title="发表于 2022-12-24 13:00:00">2022-12-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/jwt/" title="JWT学习与使用">JWT学习与使用</a><time datetime="2022-12-21T00:15:00.000Z" title="发表于 2022-12-21 08:15:00">2022-12-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/markdown2pdf/" title="Markdown转PDF">Markdown转PDF</a><time datetime="2022-12-05T05:52:00.000Z" title="发表于 2022-12-05 13:52:00">2022-12-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By infinite-zh</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
