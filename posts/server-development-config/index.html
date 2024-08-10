@@ -208,6 +208,9 @@
 <h3 id="三、创建新的用户-for-远程访问"><a href="#三、创建新的用户-for-远程访问" class="headerlink" title="三、创建新的用户 for 远程访问"></a>三、创建新的用户 for 远程访问</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># ① 适用于 MySQL 8.0之前的版本，可以直接授权</span><br><span class="line">grant all privileges on *.* to &#x27;root&#x27;@&#x27;%&#x27; identified by &#x27;123456&#x27; with grant option;</span><br><span class="line"></span><br><span class="line"># ② 适用于 MySQL 8.0之后的版本，需要先创建一个用户，再进行授权【推荐方式②】</span><br><span class="line">create user root@&#x27;%&#x27; identified by &#x27;123456&#x27;;</span><br><span class="line">grant all privileges on *.* to root@&#x27;%&#x27; with grant option;</span><br></pre></td></tr></table></figure>
 
 <p>之后需要确定<code>/etc/mysql/mysql.conf.d/mysqld.cnf</code>中的<code>bind-address</code>是否为<code>0.0.0.0</code></p>
+<p>修改完配置后，需要重启服务</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl restart mysql</span><br></pre></td></tr></table></figure>
+
 <p>此外还有服务器安全组开放3306端口</p>
 <h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>[1] <a target="_blank" rel="noopener" href="https://docs.docker.com/engine/install/ubuntu/">Install Docker Engine on Ubuntu | Docker Documentation</a></p>
 <p>[2] <a target="_blank" rel="noopener" href="https://docs.docker.com/compose/install/linux/">Install the Compose plugin | Docker Documentation</a></p>
