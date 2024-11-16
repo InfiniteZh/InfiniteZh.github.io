@@ -11,7 +11,7 @@
   </url>
   
   <url>
-    <loc>https://infinite-zh.com/categories/index.html</loc>
+    <loc>https://infinite-zh.com/link/index.html</loc>
     
     <lastmod>2024-09-16</lastmod>
     
@@ -20,7 +20,7 @@
   </url>
   
   <url>
-    <loc>https://infinite-zh.com/link/index.html</loc>
+    <loc>https://infinite-zh.com/categories/index.html</loc>
     
     <lastmod>2024-09-16</lastmod>
     
@@ -288,14 +288,14 @@
   </url>
   
   <url>
-    <loc>https://infinite-zh.com/categories/%E5%BC%80%E5%8F%91/</loc>
+    <loc>https://infinite-zh.com/categories/%E5%8D%9A%E5%AE%A2%E5%BB%BA%E8%AE%BE/</loc>
     <lastmod>2024-11-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://infinite-zh.com/categories/%E5%8D%9A%E5%AE%A2%E5%BB%BA%E8%AE%BE/</loc>
+    <loc>https://infinite-zh.com/categories/%E5%BC%80%E5%8F%91/</loc>
     <lastmod>2024-11-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
