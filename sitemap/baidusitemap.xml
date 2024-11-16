@@ -2,15 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://infinite-zh.com/posts/hexo-blog-build/</loc>
-    <lastmod>2024-08-10</lastmod>
+    <lastmod>2024-05-29</lastmod>
   </url>
   <url>
     <loc>https://infinite-zh.com/posts/server-development-config/</loc>
     <lastmod>2023-06-06</lastmod>
-  </url>
-  <url>
-    <loc>https://infinite-zh.com/posts/aliyun-chatgpt-wechat/</loc>
-    <lastmod>2023-04-17</lastmod>
   </url>
   <url>
     <loc>https://infinite-zh.com/posts/quartz-learning/</loc>
