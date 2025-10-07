@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://infinite-zh.com/posts/Cloudreve-upgrade-v4/</loc>
+    <lastmod>2025-08-01</lastmod>
+  </url>
+  <url>
     <loc>https://infinite-zh.com/posts/hexo-blog-build/</loc>
     <lastmod>2024-05-29</lastmod>
   </url>
@@ -19,10 +23,6 @@
   <url>
     <loc>https://infinite-zh.com/posts/markdown2pdf/</loc>
     <lastmod>2022-12-05</lastmod>
-  </url>
-  <url>
-    <loc>https://infinite-zh.com/posts/wordpress-markdown-latex/</loc>
-    <lastmod>2022-08-31</lastmod>
   </url>
   <url>
     <loc>https://infinite-zh.com/posts/r-cnn/</loc>
@@ -45,10 +45,6 @@
     <lastmod>2022-05-09</lastmod>
   </url>
   <url>
-    <loc>https://infinite-zh.com/posts/sklearn-study/</loc>
-    <lastmod>2022-03-10</lastmod>
-  </url>
-  <url>
     <loc>https://infinite-zh.com/posts/pytorch-hdf5-dataset/</loc>
     <lastmod>2022-02-26</lastmod>
   </url>
@@ -61,24 +57,8 @@
     <lastmod>2022-01-19</lastmod>
   </url>
   <url>
-    <loc>https://infinite-zh.com/posts/win10-configures-git-proxy-mode-to-speed-up-git-clone/</loc>
-    <lastmod>2021-12-23</lastmod>
-  </url>
-  <url>
-    <loc>https://infinite-zh.com/posts/screen/</loc>
-    <lastmod>2021-11-05</lastmod>
-  </url>
-  <url>
-    <loc>https://infinite-zh.com/posts/wsl2-installation-and-gcc-environment-construction/</loc>
-    <lastmod>2021-09-26</lastmod>
-  </url>
-  <url>
     <loc>https://infinite-zh.com/posts/xilinx-lvdsdac-ad9736/</loc>
     <lastmod>2021-08-23</lastmod>
-  </url>
-  <url>
-    <loc>https://infinite-zh.com/posts/postgraduate-experience/</loc>
-    <lastmod>2021-05-03</lastmod>
   </url>
   <url>
     <loc>https://infinite-zh.com/posts/cubeide-study-notes/</loc>
